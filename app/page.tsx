@@ -248,6 +248,42 @@ function saveFont(index: number) {
 }
 
 // ─── Canvas Composite Image Generator ───────────────────────────────
+// Loads an image via fetch → blob → objectURL to avoid CORS canvas tainting.
+// This approach works because fetch with no-cors mode gets the raw bytes,
+// and objectURL images are same-origin so they never taint the canvas.
+async function loadImageSafe(url: string): Promise<HTMLImageElement | null> {
+  try {
+    // Method 1: fetch as blob → objectURL (CORS-safe for canvas)
+    const resp = await fetch(url, { mode: 'cors' })
+    if (!resp.ok) throw new Error('Fetch failed')
+    const blob = await resp.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    const img = new Image()
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve()
+      img.onerror = () => reject(new Error('Blob image load failed'))
+      img.src = objectUrl
+    })
+    // Clean up will happen after drawing
+    ;(img as HTMLImageElement & { _objectUrl?: string })._objectUrl = objectUrl
+    return img
+  } catch {
+    // Method 2: try crossOrigin anonymous directly
+    try {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('CrossOrigin load failed'))
+        img.src = url
+      })
+      return img
+    } catch {
+      return null
+    }
+  }
+}
+
 async function generateCompositeImage(
   phrase: Phrase,
   fontFamily: string,
@@ -260,7 +296,7 @@ async function generateCompositeImage(
   canvas.height = CANVAS_H
   const ctx = canvas.getContext('2d')!
 
-  // 1. Draw gradient background (always, as fallback)
+  // 1. Draw gradient background (always present as base)
   const gradientStr = CARD_GRADIENTS[phrase.gradientIndex % CARD_GRADIENTS.length]
   const colorMatch = gradientStr.match(/#[0-9a-fA-F]{6}/g)
   const c1 = colorMatch?.[0] ?? '#e84393'
@@ -271,19 +307,11 @@ async function generateCompositeImage(
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-  // 2. Try to draw background image (gradient already drawn as fallback)
-  // We attempt crossOrigin loading; if CORS blocks canvas export we
-  // redraw gradient-only so toBlob() always succeeds.
-  let canvasTainted = false
+  // 2. Try to draw background image
+  let imageDrawn = false
   if (phrase.imageUrl) {
-    try {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve()
-        img.onerror = () => reject(new Error('Image load failed'))
-        img.src = phrase.imageUrl
-      })
+    const img = await loadImageSafe(phrase.imageUrl)
+    if (img) {
       // Cover-fit the image
       const imgRatio = img.width / img.height
       const canvasRatio = CANVAS_W / CANVAS_H
@@ -300,37 +328,55 @@ async function generateCompositeImage(
         drawY = (CANVAS_H - drawH) / 2
       }
       ctx.drawImage(img, drawX, drawY, drawW, drawH)
-      // Test if canvas is tainted by trying to read a pixel
+      // Clean up objectURL if used
+      const objUrl = (img as HTMLImageElement & { _objectUrl?: string })._objectUrl
+      if (objUrl) URL.revokeObjectURL(objUrl)
+      // Verify canvas is not tainted
       try {
         ctx.getImageData(0, 0, 1, 1)
+        imageDrawn = true
       } catch {
-        canvasTainted = true
+        // Canvas tainted — redraw gradient
+        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
+        const grad2 = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H)
+        grad2.addColorStop(0, c1)
+        grad2.addColorStop(1, c2)
+        ctx.fillStyle = grad2
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
       }
-    } catch {
-      // Image failed to load — gradient fallback already drawn
     }
   }
 
-  // If canvas was tainted by cross-origin image, redraw gradient-only
-  if (canvasTainted) {
-    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
-    const grad2 = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H)
-    grad2.addColorStop(0, c1)
-    grad2.addColorStop(1, c2)
-    ctx.fillStyle = grad2
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
-  }
-
-  // 3. Dark gradient overlay for readability
+  // 3. Dark overlay for text readability
   const overlay = ctx.createLinearGradient(0, 0, 0, CANVAS_H)
-  overlay.addColorStop(0, 'rgba(0,0,0,0.05)')
-  overlay.addColorStop(0.4, 'rgba(0,0,0,0.15)')
-  overlay.addColorStop(0.7, 'rgba(0,0,0,0.45)')
-  overlay.addColorStop(1, 'rgba(0,0,0,0.7)')
+  if (imageDrawn) {
+    overlay.addColorStop(0, 'rgba(0,0,0,0.10)')
+    overlay.addColorStop(0.35, 'rgba(0,0,0,0.20)')
+    overlay.addColorStop(0.65, 'rgba(0,0,0,0.45)')
+    overlay.addColorStop(1, 'rgba(0,0,0,0.70)')
+  } else {
+    overlay.addColorStop(0, 'rgba(0,0,0,0.02)')
+    overlay.addColorStop(0.5, 'rgba(0,0,0,0.08)')
+    overlay.addColorStop(1, 'rgba(0,0,0,0.25)')
+  }
   ctx.fillStyle = overlay
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-  // 4. Draw phrase text
+  // 4. Decorative elements for gradient-only cards
+  if (!imageDrawn) {
+    // Subtle decorative circles
+    ctx.globalAlpha = 0.08
+    ctx.fillStyle = '#ffffff'
+    ctx.beginPath()
+    ctx.arc(CANVAS_W * 0.85, CANVAS_H * 0.15, 200, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(CANVAS_W * 0.15, CANVAS_H * 0.85, 150, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.globalAlpha = 1.0
+  }
+
+  // 5. Draw phrase text
   const fontSize = phrase.text.length > 150 ? 38 : phrase.text.length > 100 ? 42 : 48
   const firstFont = fontFamily.split(',')[0].replace(/["']/g, '').trim()
   ctx.font = `600 ${fontSize}px ${firstFont}, serif`
@@ -364,10 +410,9 @@ async function generateCompositeImage(
   const totalTextHeight = lines.length * lineHeight
   const startY = (CANVAS_H - totalTextHeight) / 2 + lineHeight / 2
   // Draw opening quote
-  const quoteText = '\u201C'
   ctx.font = `600 ${fontSize + 12}px ${firstFont}, serif`
   const firstLineMetrics = ctx.measureText(lines[0] || '')
-  ctx.fillText(quoteText, CANVAS_W / 2 - firstLineMetrics.width / 2 - 20, startY - 8)
+  ctx.fillText('\u201C', CANVAS_W / 2 - firstLineMetrics.width / 2 - 20, startY - 8)
   // Draw lines
   ctx.font = `600 ${fontSize}px ${firstFont}, serif`
   lines.forEach((line, i) => {
@@ -384,13 +429,13 @@ async function generateCompositeImage(
   ctx.shadowOffsetX = 0
   ctx.shadowOffsetY = 0
 
-  // 5. Category badge at top
+  // 6. Category badge at top
   ctx.font = '500 24px sans-serif'
   ctx.fillStyle = 'rgba(255,255,255,0.7)'
   ctx.textAlign = 'center'
   ctx.fillText(phrase.categoria, CANVAS_W / 2, 60)
 
-  // 6. Watermark for free users
+  // 7. Watermark for free users
   if (!isPro) {
     ctx.font = '500 22px sans-serif'
     ctx.fillStyle = 'rgba(255,255,255,0.45)'
@@ -398,7 +443,7 @@ async function generateCompositeImage(
     ctx.fillText('Frases & Imagens', CANVAS_W - 30, CANVAS_H - 30)
   }
 
-  // 7. Convert to blob
+  // 8. Convert to blob
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
@@ -411,16 +456,41 @@ async function generateCompositeImage(
   })
 }
 
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.style.display = 'none'
+  document.body.appendChild(link)
+  // Use setTimeout to ensure click fires in all environments
+  setTimeout(() => {
+    link.click()
+    setTimeout(() => {
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 100)
+  }, 0)
+}
+
 async function sharePhrase(
   phrase: Phrase,
   fontFamily: string,
   isPro: boolean
 ): Promise<void> {
+  let blob: Blob
   try {
-    const blob = await generateCompositeImage(phrase, fontFamily, isPro)
-    const file = new File([blob], `frase-${phrase.id}.jpg`, { type: 'image/jpeg' })
+    blob = await generateCompositeImage(phrase, fontFamily, isPro)
+  } catch {
+    // Canvas generation failed entirely — use WhatsApp text fallback
+    const encodedText = encodeURIComponent(phrase.text)
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank')
+    return
+  }
 
-    // Try Web Share API with file (best on mobile)
+  // Try Web Share API with file (best on mobile)
+  try {
+    const file = new File([blob], `frase-${phrase.id}.jpg`, { type: 'image/jpeg' })
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({
         files: [file],
@@ -429,23 +499,13 @@ async function sharePhrase(
       })
       return
     }
-
-    // Fallback: download the composite image
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `frase-${phrase.id}.jpg`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
   } catch (err) {
-    // User cancelled share or error — ignore AbortError
+    // User cancelled share — ignore AbortError
     if (err instanceof Error && err.name === 'AbortError') return
-    // Final fallback: text-only WhatsApp
-    const encodedText = encodeURIComponent(phrase.text)
-    window.open(`https://wa.me/?text=${encodedText}`, '_blank')
   }
+
+  // Fallback: trigger download of the composite image
+  triggerDownload(blob, `frase-${phrase.id}.jpg`)
 }
 
 async function downloadCompositeImage(
@@ -454,14 +514,7 @@ async function downloadCompositeImage(
   isPro: boolean
 ): Promise<void> {
   const blob = await generateCompositeImage(phrase, fontFamily, isPro)
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `frase-${phrase.id}.jpg`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  triggerDownload(blob, `frase-${phrase.id}.jpg`)
 }
 
 // ─── ErrorBoundary ───────────────────────────────────────────────────

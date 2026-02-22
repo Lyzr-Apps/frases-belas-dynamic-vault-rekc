@@ -119,7 +119,7 @@ const CONTENT_BANK: Phrase[] = [
 
   // Boa Noite (4)
   { id: 'bn01', text: 'Que a noite traga paz ao seu cora\u00e7\u00e3o e que os sonhos sejam t\u00e3o lindos quanto voc\u00ea merece.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000005000, isNew: true },
-  { id: 'bn02', text: 'Boa noite! Descanse com a certeza de que amanh\u00e3 ser\u00e1 um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1475274047050-1d0c55b7b10c?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000006000 },
+  { id: 'bn02', text: 'Boa noite! Descanse com a certeza de que amanh\u00e3 ser\u00e1 um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000006000 },
   { id: 'bn03', text: 'Durma em paz sabendo que voc\u00ea fez o seu melhor hoje. O universo cuida de quem tem f\u00e9.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000007000 },
   { id: 'bn04', text: 'A noite \u00e9 o momento de agradecer pelas b\u00ean\u00e7\u00e3os do dia e confiar que amanh\u00e3 ser\u00e1 ainda melhor.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000008000, isNew: true },
 
@@ -145,13 +145,13 @@ const CONTENT_BANK: Phrase[] = [
   { id: 'az01', text: 'Amigos verdadeiros s\u00e3o como estrelas: nem sempre os vemos, mas sabemos que est\u00e3o l\u00e1.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000021000 },
   { id: 'az02', text: 'A amizade \u00e9 um tesouro que o tempo n\u00e3o desgasta. Obrigado por ser parte da minha hist\u00f3ria.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1522543558187-768b6df7c25c?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000022000, isNew: true },
   { id: 'az03', text: 'Um amigo de verdade \u00e9 aquele que te faz rir quando voc\u00ea s\u00f3 quer chorar. Gratid\u00e3o por voc\u00ea!', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000023000 },
-  { id: 'az04', text: 'A dist\u00e2ncia n\u00e3o separa amigos de verdade. O cora\u00e7\u00e3o sabe encurtar qualquer caminho.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76cb?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000024000 },
+  { id: 'az04', text: 'A dist\u00e2ncia n\u00e3o separa amigos de verdade. O cora\u00e7\u00e3o sabe encurtar qualquer caminho.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000024000 },
 
   // Familia (4)
   { id: 'fm01', text: 'Fam\u00edlia \u00e9 onde a vida come\u00e7a e o amor nunca termina. Nosso la\u00e7o \u00e9 eterno e inquebr\u00e1vel.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000025000 },
   { id: 'fm02', text: 'O maior patrim\u00f4nio que possu\u00edmos \u00e9 a nossa fam\u00edlia. Cuide com carinho de quem te ama.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000026000, isNew: true },
   { id: 'fm03', text: 'Fam\u00edlia n\u00e3o \u00e9 sobre sangue. \u00c9 sobre quem est\u00e1 disposto a segurar sua m\u00e3o nos dias dif\u00edceis.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000027000 },
-  { id: 'fm04', text: 'Lar \u00e9 onde o cora\u00e7\u00e3o encontra paz. Minha fam\u00edlia \u00e9 meu porto seguro.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1484665005710-1e86252a3fde?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000028000 },
+  { id: 'fm04', text: 'Lar \u00e9 onde o cora\u00e7\u00e3o encontra paz. Minha fam\u00edlia \u00e9 meu porto seguro.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000028000 },
 
   // Reflexao (4)
   { id: 'rf01', text: 'A vida \u00e9 um espelho: reflete de volta o que voc\u00ea mostra a ela. Escolha sempre o melhor.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000029000, isNew: true },
@@ -161,7 +161,7 @@ const CONTENT_BANK: Phrase[] = [
 
   // Gratidao (4)
   { id: 'gr01', text: 'Gratid\u00e3o transforma o que temos em suficiente. Agrade\u00e7a por cada b\u00ean\u00e7\u00e3o, grande ou pequena.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000033000 },
-  { id: 'gr02', text: 'Ser grato n\u00e3o \u00e9 apenas dizer obrigado, \u00e9 viver reconhecendo que cada dia \u00e9 um presente divino.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000034000, isNew: true },
+  { id: 'gr02', text: 'Ser grato n\u00e3o \u00e9 apenas dizer obrigado, \u00e9 viver reconhecendo que cada dia \u00e9 um presente divino.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000034000, isNew: true },
   { id: 'gr03', text: 'Comece cada dia agradecendo. A gratid\u00e3o abre portas que o dinheiro n\u00e3o consegue abrir.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000035000 },
   { id: 'gr04', text: 'A vida \u00e9 feita de pequenos momentos que merecem nossa gratid\u00e3o eterna.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000036000 },
 
@@ -469,15 +469,19 @@ function PhraseCard({
     <div
       className="relative rounded-[0.875rem] overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 shadow-md"
       style={{
-        backgroundImage: hasImage ? `url(${phrase.imageUrl})` : undefined,
-        background: hasImage ? undefined : gradient,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        background: gradient,
         minHeight: hasImage ? '200px' : '180px',
       }}
       onClick={() => onCardClick(phrase)}
     >
+      {hasImage && (
+        <img
+          src={phrase.imageUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
+      )}
       <div className={`absolute inset-0 ${hasImage ? 'bg-gradient-to-t from-black/70 via-black/20 to-transparent' : 'bg-black/5'}`} />
       <div className={`relative p-4 flex flex-col justify-between h-full ${hasImage ? 'min-h-[200px]' : 'min-h-[180px]'}`}>
         <div>
@@ -607,14 +611,15 @@ function FullScreenViewer({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{
-        backgroundImage: hasImage ? `url(${phrase.imageUrl})` : undefined,
-        background: hasImage ? undefined : gradient,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
+      style={{ background: gradient }}
     >
+      {hasImage && (
+        <img
+          src={phrase.imageUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
       <div className={`absolute inset-0 ${hasImage ? 'bg-black/30' : 'bg-black/10'}`} />
       <div className="relative flex-1 flex flex-col">
         {/* Top bar */}

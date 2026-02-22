@@ -247,12 +247,202 @@ function saveFont(index: number) {
   }
 }
 
-function shareOnWhatsApp(text: string, imageUrl?: string) {
-  const shareText = imageUrl
-    ? `${text}\n\n${imageUrl}`
-    : text
-  const encodedText = encodeURIComponent(shareText)
-  window.open(`https://wa.me/?text=${encodedText}`, '_blank')
+// ─── Canvas Composite Image Generator ───────────────────────────────
+async function generateCompositeImage(
+  phrase: Phrase,
+  fontFamily: string,
+  isPro: boolean
+): Promise<Blob> {
+  const CANVAS_W = 1080
+  const CANVAS_H = 1080
+  const canvas = document.createElement('canvas')
+  canvas.width = CANVAS_W
+  canvas.height = CANVAS_H
+  const ctx = canvas.getContext('2d')!
+
+  // 1. Draw gradient background (always, as fallback)
+  const gradientStr = CARD_GRADIENTS[phrase.gradientIndex % CARD_GRADIENTS.length]
+  const colorMatch = gradientStr.match(/#[0-9a-fA-F]{6}/g)
+  const c1 = colorMatch?.[0] ?? '#e84393'
+  const c2 = colorMatch?.[1] ?? '#fd79a8'
+  const grad = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H)
+  grad.addColorStop(0, c1)
+  grad.addColorStop(1, c2)
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
+
+  // 2. Draw background image if available
+  if (phrase.imageUrl) {
+    try {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Image load failed'))
+        img.src = phrase.imageUrl
+      })
+      // Cover-fit the image
+      const imgRatio = img.width / img.height
+      const canvasRatio = CANVAS_W / CANVAS_H
+      let drawW: number, drawH: number, drawX: number, drawY: number
+      if (imgRatio > canvasRatio) {
+        drawH = CANVAS_H
+        drawW = drawH * imgRatio
+        drawX = (CANVAS_W - drawW) / 2
+        drawY = 0
+      } else {
+        drawW = CANVAS_W
+        drawH = drawW / imgRatio
+        drawX = 0
+        drawY = (CANVAS_H - drawH) / 2
+      }
+      ctx.drawImage(img, drawX, drawY, drawW, drawH)
+    } catch {
+      // Gradient fallback already drawn
+    }
+  }
+
+  // 3. Dark gradient overlay for readability
+  const overlay = ctx.createLinearGradient(0, 0, 0, CANVAS_H)
+  overlay.addColorStop(0, 'rgba(0,0,0,0.05)')
+  overlay.addColorStop(0.4, 'rgba(0,0,0,0.15)')
+  overlay.addColorStop(0.7, 'rgba(0,0,0,0.45)')
+  overlay.addColorStop(1, 'rgba(0,0,0,0.7)')
+  ctx.fillStyle = overlay
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
+
+  // 4. Draw phrase text
+  const fontSize = phrase.text.length > 150 ? 38 : phrase.text.length > 100 ? 42 : 48
+  const firstFont = fontFamily.split(',')[0].replace(/["']/g, '').trim()
+  ctx.font = `600 ${fontSize}px ${firstFont}, serif`
+  ctx.fillStyle = '#ffffff'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.shadowColor = 'rgba(0,0,0,0.5)'
+  ctx.shadowBlur = 12
+  ctx.shadowOffsetX = 0
+  ctx.shadowOffsetY = 2
+
+  // Word-wrap text
+  const maxWidth = CANVAS_W - 120
+  const lineHeight = fontSize * 1.5
+  const words = phrase.text.split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+    const metrics = ctx.measureText(testLine)
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine)
+      currentLine = word
+    } else {
+      currentLine = testLine
+    }
+  }
+  if (currentLine) lines.push(currentLine)
+
+  // Draw wrapped text centered vertically
+  const totalTextHeight = lines.length * lineHeight
+  const startY = (CANVAS_H - totalTextHeight) / 2 + lineHeight / 2
+  // Draw opening quote
+  const quoteText = '\u201C'
+  ctx.font = `600 ${fontSize + 12}px ${firstFont}, serif`
+  const firstLineMetrics = ctx.measureText(lines[0] || '')
+  ctx.fillText(quoteText, CANVAS_W / 2 - firstLineMetrics.width / 2 - 20, startY - 8)
+  // Draw lines
+  ctx.font = `600 ${fontSize}px ${firstFont}, serif`
+  lines.forEach((line, i) => {
+    ctx.fillText(line, CANVAS_W / 2, startY + i * lineHeight)
+  })
+  // Draw closing quote
+  ctx.font = `600 ${fontSize + 12}px ${firstFont}, serif`
+  const lastLineMetrics = ctx.measureText(lines[lines.length - 1] || '')
+  ctx.fillText('\u201D', CANVAS_W / 2 + lastLineMetrics.width / 2 + 20, startY + (lines.length - 1) * lineHeight + 8)
+
+  // Reset shadow
+  ctx.shadowColor = 'transparent'
+  ctx.shadowBlur = 0
+  ctx.shadowOffsetX = 0
+  ctx.shadowOffsetY = 0
+
+  // 5. Category badge at top
+  ctx.font = '500 24px sans-serif'
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'
+  ctx.textAlign = 'center'
+  ctx.fillText(phrase.categoria, CANVAS_W / 2, 60)
+
+  // 6. Watermark for free users
+  if (!isPro) {
+    ctx.font = '500 22px sans-serif'
+    ctx.fillStyle = 'rgba(255,255,255,0.45)'
+    ctx.textAlign = 'right'
+    ctx.fillText('Frases & Imagens', CANVAS_W - 30, CANVAS_H - 30)
+  }
+
+  // 7. Convert to blob
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob)
+        else reject(new Error('Canvas toBlob failed'))
+      },
+      'image/jpeg',
+      0.92
+    )
+  })
+}
+
+async function sharePhrase(
+  phrase: Phrase,
+  fontFamily: string,
+  isPro: boolean
+): Promise<void> {
+  try {
+    const blob = await generateCompositeImage(phrase, fontFamily, isPro)
+    const file = new File([blob], `frase-${phrase.id}.jpg`, { type: 'image/jpeg' })
+
+    // Try Web Share API with file (best on mobile)
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Frases & Imagens',
+        text: phrase.text,
+      })
+      return
+    }
+
+    // Fallback: download the composite image
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `frase-${phrase.id}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    // User cancelled share or error — ignore AbortError
+    if (err instanceof Error && err.name === 'AbortError') return
+    // Final fallback: text-only WhatsApp
+    const encodedText = encodeURIComponent(phrase.text)
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank')
+  }
+}
+
+async function downloadCompositeImage(
+  phrase: Phrase,
+  fontFamily: string,
+  isPro: boolean
+): Promise<void> {
+  const blob = await generateCompositeImage(phrase, fontFamily, isPro)
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `frase-${phrase.id}.jpg`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 // ─── ErrorBoundary ───────────────────────────────────────────────────
@@ -593,20 +783,30 @@ function FullScreenViewer({
     onToggleFavorite(phrase.id)
   }, [isPro, onProUpsell, onToggleFavorite, phrase.id])
 
-  const handleDownloadClick = useCallback(() => {
+  const [isSharing, setIsSharing] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleShareClick = useCallback(async () => {
+    setIsSharing(true)
+    try {
+      await sharePhrase(phrase, fontFamily, isPro)
+    } finally {
+      setIsSharing(false)
+    }
+  }, [phrase, fontFamily, isPro])
+
+  const handleDownloadClick = useCallback(async () => {
     if (!isPro) {
       onProUpsell()
       return
     }
-    // Simulated download for pro users
-    if (phrase.imageUrl) {
-      const link = document.createElement('a')
-      link.href = phrase.imageUrl
-      link.target = '_blank'
-      link.download = `frase-${phrase.id}.jpg`
-      link.click()
+    setIsDownloading(true)
+    try {
+      await downloadCompositeImage(phrase, fontFamily, isPro)
+    } finally {
+      setIsDownloading(false)
     }
-  }, [isPro, onProUpsell, phrase.imageUrl, phrase.id])
+  }, [isPro, onProUpsell, phrase, fontFamily])
 
   return (
     <div
@@ -684,11 +884,16 @@ function FullScreenViewer({
         <div className="p-4 pb-6">
           <div className="flex items-center justify-center gap-3 p-3 rounded-2xl bg-black/20 backdrop-blur-md max-w-md mx-auto">
             <Button
-              onClick={() => shareOnWhatsApp(phrase.text, phrase.imageUrl)}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+              onClick={handleShareClick}
+              disabled={isSharing}
+              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm disabled:opacity-60"
             >
-              <FiShare2 className="w-4 h-4 mr-2" />
-              Compartilhar
+              {isSharing ? (
+                <span className="w-4 h-4 mr-2 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
+              ) : (
+                <FiShare2 className="w-4 h-4 mr-2" />
+              )}
+              {isSharing ? 'Gerando...' : 'Compartilhar'}
             </Button>
             <button
               onClick={handleFavoriteClick}
@@ -705,11 +910,16 @@ function FullScreenViewer({
             </button>
             <Button
               onClick={handleDownloadClick}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm relative"
+              disabled={isDownloading}
+              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm relative disabled:opacity-60"
             >
-              <FiDownload className="w-4 h-4 mr-2" />
-              Baixar
-              {!isPro && <FiLock className="w-3 h-3 ml-1 opacity-60" />}
+              {isDownloading ? (
+                <span className="w-4 h-4 mr-2 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
+              ) : (
+                <FiDownload className="w-4 h-4 mr-2" />
+              )}
+              {isDownloading ? 'Gerando...' : 'Baixar'}
+              {!isPro && !isDownloading && <FiLock className="w-3 h-3 ml-1 opacity-60" />}
             </Button>
           </div>
         </div>
@@ -1056,6 +1266,36 @@ function SearchView({
   )
 }
 
+// ─── Inline Share Button (for cards) ────────────────────────────────
+function ShareButton({ phrase, selectedFont, isPro }: { phrase: Phrase; selectedFont: number; isPro: boolean }) {
+  const [sharing, setSharing] = useState(false)
+  const fontFamily = FONT_OPTIONS[selectedFont]?.family ?? FONT_OPTIONS[0].family
+
+  const handleClick = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSharing(true)
+    try {
+      await sharePhrase(phrase, fontFamily, isPro)
+    } finally {
+      setSharing(false)
+    }
+  }, [phrase, fontFamily, isPro])
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={sharing}
+      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/25 backdrop-blur-sm text-white hover:bg-white/40 transition-colors disabled:opacity-60"
+    >
+      {sharing ? (
+        <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
+      ) : (
+        <FiShare2 className="w-3 h-3" />
+      )}
+    </button>
+  )
+}
+
 // ─── Favorites View ──────────────────────────────────────────────────
 function FavoritesView({
   phrases,
@@ -1117,12 +1357,7 @@ function FavoritesView({
                   isPro={isPro}
                   selectedFont={selectedFont}
                 />
-                <button
-                  onClick={() => shareOnWhatsApp(phrase.text, phrase.imageUrl)}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white/25 backdrop-blur-sm text-white hover:bg-white/40 transition-colors"
-                >
-                  <FiShare2 className="w-3 h-3" />
-                </button>
+                <ShareButton phrase={phrase} selectedFont={selectedFont} isPro={isPro} />
               </div>
             ))}
           </div>

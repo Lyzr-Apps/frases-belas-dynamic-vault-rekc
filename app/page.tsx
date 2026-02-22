@@ -469,9 +469,11 @@ function PhraseCard({
     <div
       className="relative rounded-[0.875rem] overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 shadow-md"
       style={{
-        background: hasImage ? `url(${phrase.imageUrl})` : gradient,
-        backgroundSize: hasImage ? 'cover' : undefined,
-        backgroundPosition: hasImage ? 'center' : undefined,
+        backgroundImage: hasImage ? `url(${phrase.imageUrl})` : undefined,
+        background: hasImage ? undefined : gradient,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         minHeight: hasImage ? '200px' : '180px',
       }}
       onClick={() => onCardClick(phrase)}
@@ -606,9 +608,11 @@ function FullScreenViewer({
     <div
       className="fixed inset-0 z-50 flex flex-col"
       style={{
-        background: hasImage ? `url(${phrase.imageUrl})` : gradient,
-        backgroundSize: hasImage ? 'cover' : undefined,
-        backgroundPosition: hasImage ? 'center' : undefined,
+        backgroundImage: hasImage ? `url(${phrase.imageUrl})` : undefined,
+        background: hasImage ? undefined : gradient,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <div className={`absolute inset-0 ${hasImage ? 'bg-black/30' : 'bg-black/10'}`} />

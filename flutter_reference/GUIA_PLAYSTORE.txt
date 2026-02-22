@@ -1,0 +1,630 @@
+================================================================================
+  GUIA COMPLETO: FRASES & IMAGENS -> PLAY STORE
+  Passo a passo detalhado para publicar seu app
+================================================================================
+
+TEMPO ESTIMADO: 4-6 horas (primeira vez)
+CUSTO: US$ 25 (taxa unica do Google Play Console)
+
+================================================================================
+  FASE 1: PREPARAR O COMPUTADOR
+================================================================================
+
+1.1 INSTALAR FLUTTER SDK
+─────────────────────────
+a) Acesse: https://docs.flutter.dev/get-started/install
+b) Escolha seu sistema (Windows/Mac/Linux)
+c) Baixe e extraia o SDK
+d) Adicione ao PATH:
+   - Windows: Edite variaveis de ambiente -> Path -> Adicione C:\flutter\bin
+   - Mac/Linux: Adicione ao ~/.bashrc ou ~/.zshrc:
+     export PATH="$PATH:$HOME/flutter/bin"
+e) Feche e reabra o terminal
+f) Execute: flutter doctor
+   -> Isso mostra o que falta instalar
+
+1.2 INSTALAR ANDROID STUDIO
+────────────────────────────
+a) Baixe em: https://developer.android.com/studio
+b) Instale normalmente
+c) Na primeira abertura:
+   - Aceite todas as licencas
+   - Instale o Android SDK (API 34 ou mais recente)
+   - Instale o Android SDK Command-line Tools
+   - Instale o Android SDK Build-Tools
+d) Execute novamente: flutter doctor
+   -> Aceite licencas se pedir: flutter doctor --android-licenses
+
+1.3 (OPCIONAL) INSTALAR VS CODE
+────────────────────────────────
+a) Baixe em: https://code.visualstudio.com
+b) Instale a extensao "Flutter" (ela instala "Dart" automaticamente)
+c) Ctrl+Shift+P -> "Flutter: New Project" para testar
+
+================================================================================
+  FASE 2: CRIAR O PROJETO FLUTTER
+================================================================================
+
+2.1 CRIAR PROJETO
+──────────────────
+Abra o terminal e execute:
+
+  flutter create --org com.seunome frases_e_imagens
+  cd frases_e_imagens
+
+Nota: Troque "com.seunome" pelo seu dominio invertido.
+Exemplo: se voce tem joaosilva.com, use com.joaosilva
+Se nao tem dominio, use: com.seunome (ex: com.mariafrases)
+
+2.2 COPIAR OS ARQUIVOS FLUTTER
+───────────────────────────────
+Copie TODOS os arquivos da pasta flutter_reference/ para dentro do
+projeto criado:
+
+  Copiar de:                              Para:
+  flutter_reference/pubspec.yaml      ->  frases_e_imagens/pubspec.yaml
+  flutter_reference/lib/main.dart     ->  frases_e_imagens/lib/main.dart
+  flutter_reference/lib/models/       ->  frases_e_imagens/lib/models/
+  flutter_reference/lib/data/         ->  frases_e_imagens/lib/data/
+  flutter_reference/lib/screens/      ->  frases_e_imagens/lib/screens/
+  flutter_reference/lib/services/     ->  frases_e_imagens/lib/services/
+  flutter_reference/lib/theme/        ->  frases_e_imagens/lib/theme/
+  flutter_reference/lib/widgets/      ->  frases_e_imagens/lib/widgets/
+
+2.3 INSTALAR DEPENDENCIAS
+─────────────────────────
+No terminal, dentro da pasta do projeto:
+
+  flutter pub get
+
+Se der erro em algum package, verifique a versao no pub.dev:
+  https://pub.dev
+
+2.4 TESTAR NO EMULADOR OU CELULAR
+──────────────────────────────────
+a) Emulador:
+   - Abra Android Studio -> Device Manager -> Create Device
+   - Escolha Pixel 7 (ou qualquer) -> Baixe a imagem do sistema
+   - Inicie o emulador
+   - No terminal: flutter run
+
+b) Celular fisico:
+   - Ative "Opcoes do desenvolvedor" no celular:
+     Configuracoes -> Sobre o telefone -> toque 7x no "Numero da versao"
+   - Ative "Depuracao USB" nas Opcoes do desenvolvedor
+   - Conecte o celular via USB
+   - No terminal: flutter run
+   - Aceite a autorizacao no celular
+
+c) Verifique se o app abre e funciona:
+   - As 48 frases aparecem?
+   - Os gradientes/imagens carregam?
+   - Navegar entre abas funciona?
+   - Compartilhar funciona? (testar no celular fisico)
+   - Favoritar funciona com Pro?
+
+================================================================================
+  FASE 3: CONFIGURAR ICONE E SPLASH SCREEN
+================================================================================
+
+3.1 CRIAR O ICONE DO APP
+─────────────────────────
+a) Crie uma imagem 1024x1024 pixels PNG (fundo solido, sem transparencia)
+   - Use Canva.com (gratis) ou Figma
+   - Sugestao: fundo rosa (#E21D60) com um coracao branco e aspas
+
+b) Adicione ao pubspec.yaml:
+
+   dev_dependencies:
+     flutter_launcher_icons: ^0.14.3
+
+   flutter_launcher_icons:
+     android: true
+     ios: false
+     image_path: "assets/icon/app_icon.png"
+     adaptive_icon_background: "#E21D60"
+     adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+
+c) Crie a pasta e coloque o icone:
+   mkdir -p assets/icon
+   # Coloque app_icon.png (1024x1024) na pasta assets/icon/
+
+d) Execute:
+   flutter pub get
+   dart run flutter_launcher_icons
+
+3.2 CRIAR A SPLASH SCREEN
+──────────────────────────
+a) Adicione ao pubspec.yaml:
+
+   dev_dependencies:
+     flutter_native_splash: ^2.4.4
+
+   flutter_native_splash:
+     color: "#FFF1F2"
+     image: assets/icon/app_icon.png
+     android_12:
+       color: "#FFF1F2"
+       icon_background_color: "#E21D60"
+       image: assets/icon/app_icon.png
+
+b) Execute:
+   dart run flutter_native_splash:create
+
+================================================================================
+  FASE 4: CONFIGURAR O ANDROID PARA PRODUCAO
+================================================================================
+
+4.1 ALTERAR O NOME DO APP
+──────────────────────────
+Edite: android/app/src/main/AndroidManifest.xml
+
+Encontre a linha:
+  android:label="frases_e_imagens"
+
+Troque para:
+  android:label="Frases & Imagens"
+
+4.2 CONFIGURAR PERMISSOES
+──────────────────────────
+No mesmo AndroidManifest.xml, adicione ANTES do <application>:
+
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    android:maxSdkVersion="28"/>
+
+4.3 CONFIGURAR A VERSAO MINIMA DO ANDROID
+──────────────────────────────────────────
+Edite: android/app/build.gradle
+
+Encontre:
+  minSdkVersion flutter.minSdkVersion
+
+Troque para:
+  minSdkVersion 21
+
+Isso permite Android 5.0+ (cobre 99%+ dos dispositivos).
+
+4.4 CRIAR CHAVE DE ASSINATURA (KEYSTORE)
+─────────────────────────────────────────
+IMPORTANTE: Guarde esta chave em local seguro! Se perder, nao pode
+mais atualizar o app na Play Store.
+
+No terminal (na pasta do projeto):
+
+  keytool -genkey -v -keystore ~/upload-keystore.jks \
+    -keyalg RSA -keysize 2048 -validity 10000 \
+    -alias upload
+
+Preencha:
+  - Senha do keystore: (crie uma senha forte, ANOTE!)
+  - Seu nome completo
+  - Unidade organizacional: (pode deixar vazio)
+  - Organizacao: (pode deixar vazio)
+  - Cidade, Estado, Pais: BR
+
+4.5 CONFIGURAR A ASSINATURA NO GRADLE
+──────────────────────────────────────
+a) Crie o arquivo: android/key.properties
+
+   storePassword=SUA_SENHA_AQUI
+   keyPassword=SUA_SENHA_AQUI
+   keyAlias=upload
+   storeFile=/Users/SEUUSUARIO/upload-keystore.jks
+
+   (Troque o caminho e senha pelos seus)
+
+b) Edite: android/app/build.gradle
+
+   ANTES de "android {" adicione:
+
+   def keystoreProperties = new Properties()
+   def keystorePropertiesFile = rootProject.file('key.properties')
+   if (keystorePropertiesFile.exists()) {
+       keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+   }
+
+   DENTRO de "android {" adicione (antes de buildTypes):
+
+   signingConfigs {
+       release {
+           keyAlias keystoreProperties['keyAlias']
+           keyPassword keystoreProperties['keyPassword']
+           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+           storePassword keystoreProperties['storePassword']
+       }
+   }
+
+   Em "buildTypes -> release" troque:
+
+   signingConfig signingConfigs.debug
+
+   Para:
+
+   signingConfig signingConfigs.release
+
+c) IMPORTANTE: Adicione key.properties ao .gitignore:
+
+   echo "android/key.properties" >> .gitignore
+   echo "*.jks" >> .gitignore
+
+================================================================================
+  FASE 5: GERAR O AAB (ANDROID APP BUNDLE)
+================================================================================
+
+5.1 LIMPAR E COMPILAR
+──────────────────────
+No terminal:
+
+  flutter clean
+  flutter pub get
+  flutter build appbundle --release
+
+Isso gera o arquivo:
+  build/app/outputs/bundle/release/app-release.aab
+
+Este e o arquivo que voce vai enviar para a Play Store.
+
+5.2 VERIFICAR O TAMANHO
+────────────────────────
+O AAB deve ter menos de 150 MB.
+Seu app deve ficar em torno de 15-25 MB (e pequeno).
+
+5.3 TESTAR O APK DE RELEASE
+────────────────────────────
+Antes de enviar, teste a versao release no celular:
+
+  flutter build apk --release
+  flutter install --release
+
+Verifique TUDO:
+  [ ] App abre sem erros
+  [ ] Frases carregam com imagens
+  [ ] Compartilhar funciona (WhatsApp, Instagram, etc)
+  [ ] Favoritar funciona (modo Pro)
+  [ ] Navegacao entre abas funciona
+  [ ] Busca funciona
+  [ ] Categorias funcionam
+  [ ] Fontes mudam no viewer
+
+================================================================================
+  FASE 6: PUBLICAR NA PLAY STORE
+================================================================================
+
+6.1 CRIAR CONTA DE DESENVOLVEDOR
+─────────────────────────────────
+a) Acesse: https://play.google.com/console
+b) Pague a taxa de US$ 25 (unica, nao e mensal)
+c) Preencha seus dados:
+   - Nome do desenvolvedor (aparece na loja)
+   - Email de contato (publico)
+   - Telefone
+   - Endereco
+
+6.2 CRIAR O APP NA PLAY CONSOLE
+────────────────────────────────
+a) Clique em "Criar app"
+b) Preencha:
+   - Nome: Frases & Imagens
+   - Idioma padrao: Portugues (Brasil)
+   - App ou jogo: App
+   - Gratuito ou pago: Gratuito
+   - Aceite as declaracoes
+
+6.3 CONFIGURAR A FICHA DA LOJA
+───────────────────────────────
+Va em "Presenca na loja" -> "Ficha principal da loja"
+
+a) Descricao curta (ate 80 caracteres):
+   "Frases inspiracionais com imagens lindas para compartilhar!"
+
+b) Descricao completa (ate 4000 caracteres):
+   ---
+   Frases & Imagens - O melhor app de frases para compartilhar!
+
+   Encontre frases inspiracionais, motivacionais e emocionantes com
+   imagens lindas para enviar no WhatsApp, Instagram, Facebook e
+   todas as redes sociais.
+
+   12 CATEGORIAS:
+   - Bom Dia - Comece o dia com positividade
+   - Boa Noite - Encerre o dia com paz
+   - Amor - Declare seu amor
+   - Fe - Fortaleça sua fe
+   - Aniversario - Parabenize quem voce ama
+   - Amizade - Valorize seus amigos
+   - Familia - Celebre quem importa
+   - Reflexao - Pense sobre a vida
+   - Gratidao - Agradeca pelas bencaos
+   - Religioso - Versiculos e mensagens de fe
+   - Humor - Ria e faca rir
+   - Sexta-feira - Celebre o fim de semana
+
+   RECURSOS:
+   - Imagens lindas com frases
+   - Compartilhe direto no WhatsApp e redes sociais
+   - Busque frases por palavras-chave
+   - Escolha entre 12 fontes diferentes
+   - Salve seus favoritos (Pro)
+   - Sem marca d'agua (Pro)
+
+   Baixe agora e espalhe positividade!
+   ---
+
+c) Screenshots (OBRIGATORIAMENTE pelo menos 2):
+   - Tire prints do app rodando no celular ou emulador
+   - Minimo: 2 screenshots (recomendado: 4-8)
+   - Tamanho: entre 320px e 3840px no menor lado
+   - Proporcao: 16:9 ou 9:16
+   - Formato: JPEG ou PNG (24 bits, sem alfa)
+
+   Dica: Use o emulador Pixel 7 e tire prints com:
+     Ctrl+S (no emulador) ou "adb exec-out screencap -p > screen1.png"
+
+   Screenshots recomendados:
+   1. Tela inicial com frases
+   2. Um card de frase em tela cheia
+   3. Tela de categorias
+   4. Tela de busca
+   5. Compartilhamento no WhatsApp (opcional)
+
+d) Icone do app:
+   - 512x512 PNG (32 bits com alfa)
+   - Use o mesmo icone que criou na FASE 3
+
+e) Grafico de recursos (Feature Graphic):
+   - 1024x500 pixels
+   - Crie no Canva: fundo rosa, logo, "Frases & Imagens"
+   - Aparece no topo da pagina do app na Play Store
+
+6.4 CLASSIFICACAO DE CONTEUDO
+─────────────────────────────
+Va em "Politica" -> "Classificacao de conteudo"
+
+a) Inicie o questionario
+b) Tipo: Utilitario/Produtividade
+c) Responda:
+   - Violencia: Nao
+   - Sexualidade: Nao
+   - Linguagem: Nao
+   - Substancias controladas: Nao
+   - Conteudo gerado por usuario: Nao (conteudo pre-definido)
+d) Resultado esperado: Livre (L) / Everyone (ESRB)
+
+6.5 PUBLICO-ALVO E CONTEUDO
+────────────────────────────
+Va em "Politica" -> "Publico-alvo e conteudo"
+
+a) Faixa etaria: 13+ (ou "Todos" se a classificacao permitir)
+b) Atrativo para criancas: Nao (a menos que queira passar pela
+   revisao especial de apps para criancas)
+
+6.6 CONFIGURAR ACESSO A DADOS
+──────────────────────────────
+Va em "Politica" -> "Seguranca dos dados"
+
+a) O app coleta ou compartilha dados?
+   -> Nao (se nao tiver analytics/ads)
+   -> Sim (se tiver ads/analytics — preencha os tipos)
+
+b) Se respondeu "Nao":
+   - Marque que nao coleta dados
+   - Envie
+
+c) Se tiver Google Ads (futuramente):
+   - Marque: Identificadores do dispositivo
+   - Finalidade: Publicidade
+   - Dados compartilhados: Sim (com redes de anuncios)
+
+6.7 ENVIAR O AAB
+─────────────────
+Va em "Producao" -> "Criar nova versao"
+
+a) Formato de assinatura: Google Play App Signing (aceite)
+b) Envie o arquivo .aab (da FASE 5)
+   Caminho: build/app/outputs/bundle/release/app-release.aab
+c) Nome da versao: 1.0.0
+d) Notas de versao: "Versao inicial do Frases & Imagens"
+e) Clique em "Revisar versao"
+f) Clique em "Iniciar lancamento para producao"
+
+6.8 AGUARDAR REVISAO
+─────────────────────
+- Primeira revisao: 3 a 7 dias (pode levar mais)
+- O Google vai verificar:
+  - Se o app funciona
+  - Se segue as politicas
+  - Se nao tem malware
+- Voce recebe email quando aprovado ou se precisar corrigir algo
+
+================================================================================
+  FASE 7: APOS A PUBLICACAO
+================================================================================
+
+7.1 MONITORAR
+─────────────
+- Google Play Console -> Estatisticas
+- Veja downloads, avaliacoes, crashes
+- Responda reviews dos usuarios
+
+7.2 ATUALIZAR O APP
+───────────────────
+Quando quiser atualizar:
+
+a) Edite o pubspec.yaml:
+   version: 1.1.0+2   (incremente o numero)
+
+b) Faca as alteracoes no codigo
+
+c) Compile:
+   flutter build appbundle --release
+
+d) Va na Play Console -> Producao -> Criar nova versao
+   Envie o novo .aab
+
+7.3 IMPLEMENTAR IN-APP PURCHASE (PLANO PRO)
+────────────────────────────────────────────
+Para monetizar de verdade com o plano Pro (R$ 9,90/mes):
+
+a) Adicione ao pubspec.yaml:
+   in_app_purchase: ^3.2.0
+
+b) Na Play Console:
+   - Va em "Monetizacao" -> "Assinaturas"
+   - Crie uma assinatura:
+     ID: pro_monthly
+     Nome: Plano Pro
+     Preco: R$ 9,90/mes
+     Periodo: Mensal
+
+c) Implemente a logica de compra no app usando o package
+   in_app_purchase. Documentacao:
+   https://pub.dev/packages/in_app_purchase
+
+7.4 IMPLEMENTAR ADMOB (ANUNCIOS)
+────────────────────────────────
+Para monetizar a versao gratuita:
+
+a) Crie conta no AdMob: https://admob.google.com
+b) Crie os ad units (banner, interstitial)
+c) Adicione ao pubspec.yaml:
+   google_mobile_ads: ^5.2.0
+d) Substitua o AdSlot placeholder pelos ads reais
+
+7.5 IMPLEMENTAR NOTIFICACOES PUSH
+──────────────────────────────────
+a) Crie projeto no Firebase Console: https://console.firebase.google.com
+b) Adicione o app Android
+c) Baixe google-services.json -> coloque em android/app/
+d) Adicione ao pubspec.yaml:
+   firebase_core: ^3.9.0
+   firebase_messaging: ^15.1.6
+   flutter_local_notifications: ^18.0.1
+e) Configure para enviar frase diaria as 8h da manha
+
+================================================================================
+  CHECKLIST FINAL
+================================================================================
+
+Antes de publicar, verifique:
+
+  [ ] App funciona no celular fisico
+  [ ] Todas as 48 frases aparecem
+  [ ] Compartilhar funciona (WhatsApp, Instagram, etc)
+  [ ] Download de imagem funciona
+  [ ] Favoritos funcionam (Pro)
+  [ ] Busca funciona
+  [ ] Categorias funcionam
+  [ ] Fontes mudam corretamente
+  [ ] Icone do app esta bonito
+  [ ] Splash screen aparece
+  [ ] Nome do app correto: "Frases & Imagens"
+  [ ] Conta de desenvolvedor criada (US$ 25)
+  [ ] Screenshots prontas (minimo 2)
+  [ ] Descricao preenchida
+  [ ] Classificacao de conteudo preenchida
+  [ ] Politica de privacidade (pode usar um gerador gratis)
+  [ ] AAB gerado e testado
+  [ ] AAB enviado para a Play Console
+
+================================================================================
+  POLITICA DE PRIVACIDADE (NECESSARIA)
+================================================================================
+
+Voce precisa de uma politica de privacidade. Use um gerador gratis:
+https://www.freeprivacypolicy.com/free-privacy-policy-generator/
+
+Preencha:
+  - Nome do app: Frases & Imagens
+  - Tipo: App movel
+  - Coleta dados? Nao (ou Sim se tiver ads)
+  - Contato: seu email
+
+Hospede a politica em uma pagina web gratis:
+  - GitHub Pages (gratis)
+  - Google Sites (gratis)
+  - Notion (gratis)
+  - Qualquer blog/site seu
+
+Cole o link na Play Console em:
+  Presenca na loja -> Ficha principal -> URL da politica de privacidade
+
+================================================================================
+  PROBLEMAS COMUNS E SOLUCOES
+================================================================================
+
+PROBLEMA: "flutter doctor" mostra erros
+SOLUCAO: Siga cada instrucao que o flutter doctor mostra.
+  Geralmente e instalar Android SDK ou aceitar licencas.
+
+PROBLEMA: App nao compila
+SOLUCAO:
+  flutter clean
+  flutter pub get
+  flutter build appbundle --release
+
+PROBLEMA: Imagens nao carregam
+SOLUCAO: Verifique se tem permissao INTERNET no AndroidManifest.xml
+
+PROBLEMA: Keystore perdido
+SOLUCAO: Nao tem solucao! Voce tera que criar um novo app.
+  SEMPRE faca backup do upload-keystore.jks e key.properties.
+
+PROBLEMA: App rejeitado na Play Store
+SOLUCAO: Leia o email de rejeicao. Os motivos mais comuns:
+  - Falta politica de privacidade
+  - Screenshots nao correspondem ao app
+  - Descricao nao e clara o suficiente
+  - App com crashes
+
+PROBLEMA: Compilacao demora muito
+SOLUCAO: Normal na primeira vez (10-20 min).
+  As proximas sao mais rapidas (2-5 min).
+
+================================================================================
+  ESTRUTURA FINAL DO PROJETO FLUTTER
+================================================================================
+
+frases_e_imagens/
+  lib/
+    main.dart                    <- Entrada do app
+    models/
+      phrase.dart                <- Modelos de dados
+    data/
+      content_bank.dart          <- 48 frases
+      categories.dart            <- 12 categorias
+      gradients.dart             <- Gradientes dos cards
+      fonts.dart                 <- 12 opcoes de fonte
+    screens/
+      home_screen.dart           <- Tela inicial
+      categories_screen.dart     <- Grid de categorias
+      search_screen.dart         <- Busca
+      favorites_screen.dart      <- Favoritos (Pro)
+      fullscreen_viewer.dart     <- Viewer em tela cheia
+    services/
+      storage_service.dart       <- SharedPreferences
+      share_service.dart         <- Compartilhar + download
+    theme/
+      app_theme.dart             <- Tema Rose Garden
+    widgets/
+      phrase_card.dart           <- Card de frase
+      font_selector.dart         <- Seletor de fonte
+      pro_upsell_dialog.dart     <- Dialog de upsell Pro
+      category_chip.dart         <- Chip de categoria
+  android/
+    app/
+      src/main/
+        AndroidManifest.xml      <- Configuracoes Android
+      build.gradle               <- Gradle com assinatura
+    key.properties               <- Chaves (NAO COMMITAR!)
+  assets/
+    icon/
+      app_icon.png               <- Icone 1024x1024
+  pubspec.yaml                   <- Dependencias
+  upload-keystore.jks            <- Chave de assinatura (BACKUP!)
+
+================================================================================
+  FIM DO GUIA
+================================================================================
+Boa sorte com a publicacao! O app esta completo e pronto para ser
+compilado. Qualquer duvida, volte aqui para consultar.

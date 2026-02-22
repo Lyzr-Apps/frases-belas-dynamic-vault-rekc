@@ -1,0 +1,58 @@
+name: frases_e_imagens
+description: Frases inspiracionais com imagens para compartilhar no WhatsApp e redes sociais.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+  # Compartilhamento e screenshot
+  share_plus: ^10.1.4
+  screenshot: ^3.0.0
+  path_provider: ^2.1.5
+
+  # Armazenamento local
+  shared_preferences: ^2.3.4
+
+  # Imagem na galeria (opcional — para "Baixar")
+  # image_gallery_saver: ^2.0.3
+
+  # Notificacoes push (para futura implementacao)
+  # firebase_messaging: ^15.1.6
+  # flutter_local_notifications: ^18.0.1
+
+  # In-app purchase (para plano Pro)
+  # in_app_purchase: ^3.2.0
+
+  # Ads (para versao free)
+  # google_mobile_ads: ^5.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Se quiser incluir assets locais (imagens de fallback, etc):
+  # assets:
+  #   - assets/images/
+
+  # Fontes customizadas (alternativa ao google_fonts):
+  # fonts:
+  #   - family: Merriweather
+  #     fonts:
+  #       - asset: assets/fonts/Merriweather-Regular.ttf
+  #       - asset: assets/fonts/Merriweather-Bold.ttf
+  #         weight: 700

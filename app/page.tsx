@@ -271,19 +271,18 @@ async function generateCompositeImage(
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-  // 2. Draw background image if available (via proxy to avoid CORS)
+  // 2. Try to draw background image (gradient already drawn as fallback)
+  // We attempt crossOrigin loading; if CORS blocks canvas export we
+  // redraw gradient-only so toBlob() always succeeds.
+  let canvasTainted = false
   if (phrase.imageUrl) {
     try {
-      const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(phrase.imageUrl)}`
-      const resp = await fetch(proxyUrl)
-      if (!resp.ok) throw new Error('Proxy fetch failed')
-      const blob = await resp.blob()
-      const bitmapUrl = URL.createObjectURL(blob)
       const img = new Image()
+      img.crossOrigin = 'anonymous'
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve()
         img.onerror = () => reject(new Error('Image load failed'))
-        img.src = bitmapUrl
+        img.src = phrase.imageUrl
       })
       // Cover-fit the image
       const imgRatio = img.width / img.height
@@ -301,10 +300,25 @@ async function generateCompositeImage(
         drawY = (CANVAS_H - drawH) / 2
       }
       ctx.drawImage(img, drawX, drawY, drawW, drawH)
-      URL.revokeObjectURL(bitmapUrl)
+      // Test if canvas is tainted by trying to read a pixel
+      try {
+        ctx.getImageData(0, 0, 1, 1)
+      } catch {
+        canvasTainted = true
+      }
     } catch {
-      // Gradient fallback already drawn
+      // Image failed to load — gradient fallback already drawn
     }
+  }
+
+  // If canvas was tainted by cross-origin image, redraw gradient-only
+  if (canvasTainted) {
+    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
+    const grad2 = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H)
+    grad2.addColorStop(0, c1)
+    grad2.addColorStop(1, c2)
+    ctx.fillStyle = grad2
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
   }
 
   // 3. Dark gradient overlay for readability

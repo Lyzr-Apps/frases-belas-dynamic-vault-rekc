@@ -1,0 +1,24 @@
+{
+  "agent_name": "Gerador de Imagens",
+  "agent_id": "699a77b7b0da46f6ada21c31",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": true,
+  "response_schema": {
+    "prompt_usado": "string - O prompt em ingles usado para gerar a imagem",
+    "categoria": "string - A categoria da imagem gerada"
+  },
+  "module_outputs_schema": {
+    "artifact_files": [
+      {
+        "file_url": "string - URL da imagem gerada",
+        "name": "string - Nome do arquivo",
+        "format_type": "string - Formato (png, jpg)"
+      }
+    ]
+  },
+  "sample_response": {
+    "prompt_usado": "A beautiful golden sunrise over misty mountains with warm light rays, no text",
+    "categoria": "Bom Dia"
+  }
+}

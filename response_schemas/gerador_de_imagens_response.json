@@ -1,0 +1,24 @@
+{
+  "agent_name": "Gerador de Imagens",
+  "agent_id": "699a77b7b0da46f6ada21c31",
+  "description": "Gera imagens bonitas e art\u00edsticas para acompanhar frases inspiracionais de compartilhamento. Cria paisagens, artes, cen\u00e1rios e composi\u00e7\u00f5es visuais que combinam com o tema da frase (amor, f\u00e9, bom dia, natureza, etc.). As imagens s\u00e3o otimizadas para compartilhamento no WhatsApp.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "prompt_usado": "string",
+    "categoria": "string"
+  },
+  "example_response": {
+    "prompt_usado": "O prompt em ingl\u00eas usado para gerar a imagem",
+    "categoria": "A categoria da imagem gerada"
+  },
+  "has_module_outputs": true,
+  "module_outputs_example": {
+    "artifact_files": [
+      {
+        "file_url": "https://example.com/image.png"
+      }
+    ]
+  }
+}

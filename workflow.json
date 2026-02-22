@@ -2,10 +2,12 @@
   "nodes": [
     {"id": "input_node", "type": "Input", "label": "Categoria & Tom", "nodeCategory": "input"},
     {"id": "gerador_frases", "type": "Agent", "label": "Gerador de Frases", "nodeCategory": "agent"},
-    {"id": "output_node", "type": "Output", "label": "Frase Gerada", "nodeCategory": "end"}
+    {"id": "gerador_imagens", "type": "Agent", "label": "Gerador de Imagens", "nodeCategory": "agent"},
+    {"id": "output_node", "type": "Output", "label": "Imagem com Frase", "nodeCategory": "end"}
   ],
   "edges": [
     {"source": "input_node", "target": "gerador_frases"},
-    {"source": "gerador_frases", "target": "output_node"}
+    {"source": "gerador_frases", "target": "gerador_imagens"},
+    {"source": "gerador_imagens", "target": "output_node"}
   ]
 }

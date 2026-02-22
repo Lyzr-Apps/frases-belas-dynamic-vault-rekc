@@ -30,11 +30,13 @@ import {
   FiChevronRight,
   FiRefreshCw,
   FiArrowLeft,
+  FiImage,
 } from 'react-icons/fi'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 
 // ─── Constants ───────────────────────────────────────────────────────
 const AGENT_ID = '699a74a9c2eec05acd279d41'
+const IMAGE_AGENT_ID = '699a77b7b0da46f6ada21c31'
 const FAVORITES_KEY = 'frases-favoritos'
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -45,6 +47,7 @@ interface Phrase {
   emoji: string
   isNew?: boolean
   isAIGenerated?: boolean
+  imageUrl?: string
   gradientIndex: number
   createdAt: number
 }
@@ -92,27 +95,27 @@ const CATEGORIES: Category[] = [
 
 // ─── Seed Phrases ────────────────────────────────────────────────────
 const SEED_PHRASES: Phrase[] = [
-  { id: 'sd01', text: 'Que o sol deste novo dia ilumine seus caminhos e aqueca seu coracao com esperanca e gratidao.', categoria: 'Bom Dia', emoji: '', gradientIndex: 0, createdAt: 1700000001000, isNew: true },
+  { id: 'sd01', text: 'Que o sol deste novo dia ilumine seus caminhos e aqueca seu coracao com esperanca e gratidao.', categoria: 'Bom Dia', emoji: '', gradientIndex: 0, createdAt: 1700000001000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&h=600&fit=crop' },
   { id: 'sd02', text: 'Bom dia! Que cada passo de hoje te leve mais perto dos seus sonhos. A vida e bela demais para ser desperdicada.', categoria: 'Bom Dia', emoji: '', gradientIndex: 1, createdAt: 1700000002000 },
   { id: 'sd03', text: 'Acorde com gratidao no coracao e um sorriso no rosto. Hoje e um presente que merece ser vivido intensamente.', categoria: 'Bom Dia', emoji: '', gradientIndex: 2, createdAt: 1700000003000 },
-  { id: 'sd04', text: 'Que a noite traga paz ao seu coracao e que os sonhos sejam tao lindos quanto voce merece.', categoria: 'Boa Noite', emoji: '', gradientIndex: 3, createdAt: 1700000004000, isNew: true },
+  { id: 'sd04', text: 'Que a noite traga paz ao seu coracao e que os sonhos sejam tao lindos quanto voce merece.', categoria: 'Boa Noite', emoji: '', gradientIndex: 3, createdAt: 1700000004000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=600&h=600&fit=crop' },
   { id: 'sd05', text: 'Boa noite! Descanse com a certeza de que amanha sera um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', gradientIndex: 4, createdAt: 1700000005000 },
   { id: 'sd06', text: 'Durma em paz sabendo que voce fez o seu melhor hoje. O universo cuida de quem tem fe.', categoria: 'Boa Noite', emoji: '', gradientIndex: 5, createdAt: 1700000006000 },
-  { id: 'sd07', text: 'O amor e a forca mais poderosa do universo. Quando amamos de verdade, tudo se transforma.', categoria: 'Amor', emoji: '', gradientIndex: 0, createdAt: 1700000007000, isNew: true },
+  { id: 'sd07', text: 'O amor e a forca mais poderosa do universo. Quando amamos de verdade, tudo se transforma.', categoria: 'Amor', emoji: '', gradientIndex: 0, createdAt: 1700000007000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&h=600&fit=crop' },
   { id: 'sd08', text: 'Amar e encontrar no outro a metade que completa nosso coracao. Voce e o meu mundo inteiro.', categoria: 'Amor', emoji: '', gradientIndex: 1, createdAt: 1700000008000 },
   { id: 'sd09', text: 'O verdadeiro amor nao conhece distancia, tempo ou obstaculos. Ele simplesmente existe e persiste.', categoria: 'Amor', emoji: '', gradientIndex: 2, createdAt: 1700000009000 },
-  { id: 'sd10', text: 'A fe move montanhas e transforma o impossivel em possivel. Confie sempre na vontade de Deus.', categoria: 'Fe', emoji: '', gradientIndex: 3, createdAt: 1700000010000 },
+  { id: 'sd10', text: 'A fe move montanhas e transforma o impossivel em possivel. Confie sempre na vontade de Deus.', categoria: 'Fe', emoji: '', gradientIndex: 3, createdAt: 1700000010000, imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=600&fit=crop' },
   { id: 'sd11', text: 'Quando a fe fala mais alto que o medo, milagres acontecem. Acredite no poder da sua oracao.', categoria: 'Fe', emoji: '', gradientIndex: 4, createdAt: 1700000011000, isNew: true },
   { id: 'sd12', text: 'Entregue seus planos nas maos de Deus e Ele fara infinitamente mais do que voce pode imaginar.', categoria: 'Fe', emoji: '', gradientIndex: 5, createdAt: 1700000012000 },
   { id: 'sd13', text: 'Feliz aniversario! Que este novo ciclo seja repleto de realizacoes, saude e muito amor.', categoria: 'Aniversario', emoji: '', gradientIndex: 0, createdAt: 1700000013000 },
   { id: 'sd14', text: 'Parabens! Que cada ano que passa te traga mais sabedoria, alegria e motivos para sorrir.', categoria: 'Aniversario', emoji: '', gradientIndex: 1, createdAt: 1700000014000 },
   { id: 'sd15', text: 'Neste dia especial, desejo que todos os seus sonhos ganhem asas e alcancem o ceu.', categoria: 'Aniversario', emoji: '', gradientIndex: 2, createdAt: 1700000015000, isNew: true },
-  { id: 'sd16', text: 'Amigos verdadeiros sao como estrelas: nem sempre os vemos, mas sabemos que estao la.', categoria: 'Amizade', emoji: '', gradientIndex: 3, createdAt: 1700000016000 },
+  { id: 'sd16', text: 'Amigos verdadeiros sao como estrelas: nem sempre os vemos, mas sabemos que estao la.', categoria: 'Amizade', emoji: '', gradientIndex: 3, createdAt: 1700000016000, imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop' },
   { id: 'sd17', text: 'A amizade e um tesouro que o tempo nao desgasta. Obrigado por ser parte da minha historia.', categoria: 'Amizade', emoji: '', gradientIndex: 4, createdAt: 1700000017000 },
   { id: 'sd18', text: 'Um amigo de verdade e aquele que te faz rir quando voce so quer chorar. Gratidao por voce!', categoria: 'Amizade', emoji: '', gradientIndex: 5, createdAt: 1700000018000, isNew: true },
-  { id: 'sd19', text: 'Familia e onde a vida comeca e o amor nunca termina. Nosso laco e eterno e inquebravel.', categoria: 'Familia', emoji: '', gradientIndex: 0, createdAt: 1700000019000 },
+  { id: 'sd19', text: 'Familia e onde a vida comeca e o amor nunca termina. Nosso laco e eterno e inquebravel.', categoria: 'Familia', emoji: '', gradientIndex: 0, createdAt: 1700000019000, imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=600&fit=crop' },
   { id: 'sd20', text: 'O maior patrimonio que possuimos e a nossa familia. Cuide com carinho de quem te ama.', categoria: 'Familia', emoji: '', gradientIndex: 1, createdAt: 1700000020000 },
-  { id: 'sd21', text: 'A vida e um espelho: reflete de volta o que voce mostra a ela. Escolha sempre o melhor.', categoria: 'Reflexao', emoji: '', gradientIndex: 2, createdAt: 1700000021000, isNew: true },
+  { id: 'sd21', text: 'A vida e um espelho: reflete de volta o que voce mostra a ela. Escolha sempre o melhor.', categoria: 'Reflexao', emoji: '', gradientIndex: 2, createdAt: 1700000021000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop' },
   { id: 'sd22', text: 'Nao espere o momento perfeito. Tome o momento e faca-o perfeito com sua atitude.', categoria: 'Reflexao', emoji: '', gradientIndex: 3, createdAt: 1700000022000 },
   { id: 'sd23', text: 'Cada dia e uma nova chance de reescrever sua historia. Nao desista do seu capitulo mais bonito.', categoria: 'Reflexao', emoji: '', gradientIndex: 4, createdAt: 1700000023000 },
   { id: 'sd24', text: 'Gratidao transforma o que temos em suficiente. Agradeca por cada bencao, grande ou pequena.', categoria: 'Gratidao', emoji: '', gradientIndex: 5, createdAt: 1700000024000 },
@@ -122,7 +125,7 @@ const SEED_PHRASES: Phrase[] = [
   { id: 'sd28', text: 'Porque Deus tanto amou o mundo que deu o Seu Filho, para que todo o que nele cre nao pereca.', categoria: 'Religioso', emoji: '', gradientIndex: 3, createdAt: 1700000028000, isNew: true },
   { id: 'sd29', text: 'A vida e curta demais para nao rir das coisas bobas. Sorria, pois o riso e o melhor remedio!', categoria: 'Humor', emoji: '', gradientIndex: 4, createdAt: 1700000029000 },
   { id: 'sd30', text: 'Se a vida te der limoes, faca uma caipirinha! Afinal, estamos no Brasil.', categoria: 'Humor', emoji: '', gradientIndex: 5, createdAt: 1700000030000 },
-  { id: 'sd31', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 0, createdAt: 1700000031000, isNew: true },
+  { id: 'sd31', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 0, createdAt: 1700000031000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=600&fit=crop' },
   { id: 'sd32', text: 'Sextou! Que este final de semana seja regado de boas risadas, boa musica e muita paz.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 1, createdAt: 1700000032000 },
   { id: 'sd33', text: 'A melhor hora da semana chegou! Bora celebrar a vida nesta sexta-feira maravilhosa.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 2, createdAt: 1700000033000 },
   { id: 'sd34', text: 'Bom dia! Lembre-se: voce e mais forte do que imagina e mais amado do que sabe.', categoria: 'Bom Dia', emoji: '', gradientIndex: 3, createdAt: 1700000034000 },
@@ -164,8 +167,11 @@ function saveFavorites(ids: string[]) {
   }
 }
 
-function shareOnWhatsApp(text: string) {
-  const encodedText = encodeURIComponent(text)
+function shareOnWhatsApp(text: string, imageUrl?: string) {
+  const shareText = imageUrl
+    ? `${text}\n\n${imageUrl}`
+    : text
+  const encodedText = encodeURIComponent(shareText)
   window.open(`https://wa.me/?text=${encodedText}`, '_blank')
 }
 
@@ -227,15 +233,21 @@ function PhraseCard({
 }) {
   const gradient = CARD_GRADIENTS[phrase.gradientIndex % CARD_GRADIENTS.length]
   const textColorClass = CARD_TEXT_COLORS[phrase.gradientIndex % CARD_TEXT_COLORS.length]
+  const hasImage = !!phrase.imageUrl
 
   return (
     <div
       className="relative rounded-[0.875rem] overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 shadow-md"
-      style={{ background: gradient, minHeight: '180px' }}
+      style={{
+        background: hasImage ? `url(${phrase.imageUrl})` : gradient,
+        backgroundSize: hasImage ? 'cover' : undefined,
+        backgroundPosition: hasImage ? 'center' : undefined,
+        minHeight: hasImage ? '200px' : '180px',
+      }}
       onClick={() => onCardClick(phrase)}
     >
-      <div className="absolute inset-0 bg-black/5" />
-      <div className="relative p-4 flex flex-col justify-between h-full min-h-[180px]">
+      <div className={`absolute inset-0 ${hasImage ? 'bg-gradient-to-t from-black/70 via-black/20 to-transparent' : 'bg-black/5'}`} />
+      <div className={`relative p-4 flex flex-col justify-between h-full ${hasImage ? 'min-h-[200px]' : 'min-h-[180px]'}`}>
         <div>
           {phrase.isNew && (
             <Badge className="mb-2 bg-white/25 text-white border-white/30 text-[10px] backdrop-blur-sm">
@@ -247,12 +259,17 @@ function PhraseCard({
               <FiZap className="w-3 h-3 mr-1" /> IA
             </Badge>
           )}
-          <p className={`text-sm font-medium leading-relaxed tracking-tight ${textColorClass}`} style={{ textShadow: phrase.gradientIndex === 4 ? 'none' : '0 1px 3px rgba(0,0,0,0.2)' }}>
+          {hasImage && phrase.isAIGenerated && (
+            <Badge className="mb-2 ml-1 bg-white/25 text-white border-white/30 text-[10px] backdrop-blur-sm">
+              <FiImage className="w-3 h-3 mr-1" /> DALL-E
+            </Badge>
+          )}
+          <p className={`text-sm font-medium leading-relaxed tracking-tight ${hasImage ? 'text-white' : textColorClass}`} style={{ textShadow: hasImage ? '0 1px 4px rgba(0,0,0,0.5)' : (phrase.gradientIndex === 4 ? 'none' : '0 1px 3px rgba(0,0,0,0.2)') }}>
             {phrase.text.length > 120 ? phrase.text.substring(0, 120) + '...' : phrase.text}
           </p>
         </div>
         <div className="flex items-center justify-between mt-3">
-          <span className={`text-xs font-medium opacity-80 ${textColorClass}`}>
+          <span className={`text-xs font-medium opacity-80 ${hasImage ? 'text-white' : textColorClass}`}>
             {phrase.categoria}
           </span>
           <button
@@ -265,7 +282,7 @@ function PhraseCard({
             {isFavorited ? (
               <FaHeart className="w-3.5 h-3.5 text-white" />
             ) : (
-              <FaRegHeart className={`w-3.5 h-3.5 ${textColorClass}`} />
+              <FaRegHeart className={`w-3.5 h-3.5 ${hasImage ? 'text-white' : textColorClass}`} />
             )}
           </button>
         </div>
@@ -322,10 +339,18 @@ function FullScreenViewer({
   const currentIndex = phrases.findIndex((p) => p.id === phrase.id)
   const hasPrev = currentIndex > 0
   const hasNext = currentIndex < phrases.length - 1
+  const hasImage = !!phrase.imageUrl
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: gradient }}>
-      <div className="absolute inset-0 bg-black/10" />
+    <div
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{
+        background: hasImage ? `url(${phrase.imageUrl})` : gradient,
+        backgroundSize: hasImage ? 'cover' : undefined,
+        backgroundPosition: hasImage ? 'center' : undefined,
+      }}
+    >
+      <div className={`absolute inset-0 ${hasImage ? 'bg-black/30' : 'bg-black/10'}`} />
       <div className="relative flex-1 flex flex-col">
         {/* Top bar */}
         <div className="flex items-center justify-between p-4">
@@ -336,6 +361,7 @@ function FullScreenViewer({
             <FiX className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-sm text-white text-sm">
+            {hasImage && <FiImage className="w-3.5 h-3.5" />}
             <span>{phrase.categoria}</span>
           </div>
         </div>
@@ -343,7 +369,7 @@ function FullScreenViewer({
         {/* Phrase content */}
         <div className="flex-1 flex items-center justify-center px-8">
           <div className="max-w-lg text-center">
-            <p className="text-2xl md:text-3xl font-serif font-semibold text-white leading-relaxed tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+            <p className="text-2xl md:text-3xl font-serif font-semibold text-white leading-relaxed tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
               &ldquo;{phrase.text}&rdquo;
             </p>
             {phrase.emoji && (
@@ -378,7 +404,7 @@ function FullScreenViewer({
         <div className="p-4 pb-6">
           <div className="flex items-center justify-center gap-3 p-3 rounded-2xl bg-black/20 backdrop-blur-md max-w-md mx-auto">
             <Button
-              onClick={() => shareOnWhatsApp(phrase.text)}
+              onClick={() => shareOnWhatsApp(phrase.text, phrase.imageUrl)}
               className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
             >
               <FiShare2 className="w-4 h-4 mr-2" />
@@ -416,61 +442,92 @@ function AIGenerationSheet({
   onClose,
   categoryName,
   onPhraseGenerated,
+  onStepChange,
 }: {
   isOpen: boolean
   onClose: () => void
   categoryName: string
   onPhraseGenerated: (phrase: Phrase) => void
+  onStepChange?: (step: 'frase' | 'imagem' | null) => void
 }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [generatedPhrase, setGeneratedPhrase] = useState<Phrase | null>(null)
-  const [activeAgentId, setActiveAgentId] = useState<string | null>(null)
+  const [generationStep, setGenerationStep] = useState<'frase' | 'imagem' | null>(null)
+
+  const updateStep = useCallback((step: 'frase' | 'imagem' | null) => {
+    setGenerationStep(step)
+    onStepChange?.(step)
+  }, [onStepChange])
 
   const handleGenerate = useCallback(async () => {
     setLoading(true)
     setError(null)
     setGeneratedPhrase(null)
-    setActiveAgentId(AGENT_ID)
+    updateStep('frase')
 
     try {
-      const message = `Gere uma frase inspiracional na categoria: ${categoryName}. Tom: inspiracional e emotivo. Responda em JSON com os campos: frase, categoria, emoji.`
-      const result = await callAIAgent(message, AGENT_ID)
+      // STEP 1: Generate the phrase
+      const phraseMessage = `Gere uma frase inspiracional na categoria: ${categoryName}. Tom: inspiracional e emotivo. Responda em JSON com os campos: frase, categoria, emoji.`
+      const phraseResult = await callAIAgent(phraseMessage, AGENT_ID)
 
-      if (result.success) {
-        let parsed = result?.response?.result
-        if (typeof parsed === 'string') {
-          parsed = parseLLMJson(parsed)
-        }
-        const frase = parsed?.frase || ''
-        const categoria = parsed?.categoria || categoryName
-        const emoji = parsed?.emoji || ''
-
-        if (frase) {
-          const newPhrase: Phrase = {
-            id: generateId(),
-            text: frase,
-            categoria: categoria,
-            emoji: emoji,
-            isAIGenerated: true,
-            isNew: true,
-            gradientIndex: Math.floor(Math.random() * CARD_GRADIENTS.length),
-            createdAt: Date.now(),
-          }
-          setGeneratedPhrase(newPhrase)
-        } else {
-          setError('Nao foi possivel gerar a frase. Tente novamente.')
-        }
-      } else {
-        setError(result?.error || 'Erro ao gerar frase. Tente novamente.')
+      if (!phraseResult.success) {
+        setError(phraseResult?.error || 'Erro ao gerar frase. Tente novamente.')
+        setLoading(false)
+        updateStep(null)
+        return
       }
+
+      let parsed = phraseResult?.response?.result
+      if (typeof parsed === 'string') {
+        parsed = parseLLMJson(parsed)
+      }
+      const frase = parsed?.frase || ''
+      const categoria = parsed?.categoria || categoryName
+      const emoji = parsed?.emoji || ''
+
+      if (!frase) {
+        setError('Nao foi possivel gerar a frase. Tente novamente.')
+        setLoading(false)
+        updateStep(null)
+        return
+      }
+
+      // STEP 2: Generate the image
+      updateStep('imagem')
+
+      const imageMessage = `Crie uma imagem artistica e bonita para acompanhar esta frase inspiracional. Categoria: ${categoria}. Frase: "${frase}". A imagem deve ser uma paisagem ou arte bonita que combine com o tema. NAO inclua texto na imagem. Estilo: fotorrealista, cores vibrantes, composicao impactante. Formato quadrado.`
+      const imageResult = await callAIAgent(imageMessage, IMAGE_AGENT_ID)
+
+      let imageUrl = ''
+      if (imageResult.success) {
+        // Image is at TOP LEVEL: result.module_outputs?.artifact_files
+        const artifactFiles = imageResult?.module_outputs?.artifact_files
+        if (Array.isArray(artifactFiles) && artifactFiles.length > 0) {
+          imageUrl = artifactFiles[0]?.file_url || ''
+        }
+      }
+      // Note: If image generation fails, we still show the phrase with a gradient fallback
+
+      const newPhrase: Phrase = {
+        id: generateId(),
+        text: frase,
+        categoria: categoria,
+        emoji: emoji,
+        isAIGenerated: true,
+        isNew: true,
+        imageUrl: imageUrl || undefined,
+        gradientIndex: Math.floor(Math.random() * CARD_GRADIENTS.length),
+        createdAt: Date.now(),
+      }
+      setGeneratedPhrase(newPhrase)
     } catch {
       setError('Erro de conexao. Tente novamente.')
     } finally {
       setLoading(false)
-      setActiveAgentId(null)
+      updateStep(null)
     }
-  }, [categoryName])
+  }, [categoryName, updateStep])
 
   useEffect(() => {
     if (isOpen && !generatedPhrase && !loading && !error) {
@@ -500,7 +557,7 @@ function AIGenerationSheet({
     : CARD_GRADIENTS[0]
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { onClose(); setGeneratedPhrase(null); setError(null); } }}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { onClose(); setGeneratedPhrase(null); setError(null); updateStep(null); } }}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0 bg-card">
         <DialogTitle className="sr-only">Gerar Frase com IA</DialogTitle>
         <div className="p-6">
@@ -515,13 +572,28 @@ function AIGenerationSheet({
           {loading && (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <FiZap className="w-6 h-6 text-primary animate-pulse" />
+                {generationStep === 'imagem' ? (
+                  <FiImage className="w-6 h-6 text-primary animate-pulse" />
+                ) : (
+                  <FiZap className="w-6 h-6 text-primary animate-pulse" />
+                )}
               </div>
-              <p className="text-sm text-muted-foreground mb-2">Gerando frase...</p>
+              <p className="text-sm text-muted-foreground mb-2">
+                {generationStep === 'imagem' ? 'Criando imagem bonita...' : 'Gerando frase...'}
+              </p>
               <LoadingDots />
-              {activeAgentId && (
-                <p className="text-xs text-muted-foreground mt-3">Agente ativo: Gerador de Frases</p>
-              )}
+              {/* Step indicators */}
+              <div className="flex items-center gap-3 mt-4">
+                <div className={`flex items-center gap-1.5 text-xs ${generationStep === 'frase' ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${generationStep === 'frase' ? 'bg-primary animate-pulse' : generationStep === 'imagem' ? 'bg-green-500' : 'bg-muted'}`} />
+                  Frase
+                </div>
+                <div className="w-4 h-px bg-border" />
+                <div className={`flex items-center gap-1.5 text-xs ${generationStep === 'imagem' ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${generationStep === 'imagem' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
+                  Imagem
+                </div>
+              </div>
             </div>
           )}
 
@@ -541,19 +613,35 @@ function AIGenerationSheet({
           {generatedPhrase && !loading && !error && (
             <div className="space-y-4">
               <div
-                className="rounded-[0.875rem] p-5 min-h-[140px] flex flex-col justify-center"
-                style={{ background: gradient }}
+                className="rounded-[0.875rem] overflow-hidden min-h-[220px] flex flex-col justify-end relative"
+                style={{
+                  background: generatedPhrase.imageUrl
+                    ? `url(${generatedPhrase.imageUrl})`
+                    : gradient,
+                  backgroundSize: generatedPhrase.imageUrl ? 'cover' : undefined,
+                  backgroundPosition: generatedPhrase.imageUrl ? 'center' : undefined,
+                }}
               >
-                <p className="text-white font-medium text-base leading-relaxed tracking-tight text-center" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>
-                  &ldquo;{generatedPhrase.text}&rdquo;
-                </p>
-                {generatedPhrase.emoji && (
-                  <p className="text-center mt-2 text-xl">{generatedPhrase.emoji}</p>
-                )}
+                {/* Overlay for text readability */}
+                <div className={`absolute inset-0 ${generatedPhrase.imageUrl ? 'bg-gradient-to-t from-black/70 via-black/30 to-transparent' : ''}`} />
+                <div className="relative p-5">
+                  <p className="text-white font-serif font-medium text-base leading-relaxed tracking-tight text-center" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                    &ldquo;{generatedPhrase.text}&rdquo;
+                  </p>
+                  {generatedPhrase.emoji && (
+                    <p className="text-center mt-2 text-xl">{generatedPhrase.emoji}</p>
+                  )}
+                </div>
               </div>
+              {generatedPhrase.imageUrl && (
+                <div className="flex items-center gap-1.5 justify-center">
+                  <FiImage className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Imagem gerada por DALL-E 3</span>
+                </div>
+              )}
               <div className="flex gap-2">
                 <Button
-                  onClick={() => shareOnWhatsApp(generatedPhrase.text)}
+                  onClick={() => shareOnWhatsApp(generatedPhrase.text, generatedPhrase.imageUrl)}
                   variant="outline"
                   className="flex-1 gap-2"
                 >
@@ -808,7 +896,7 @@ function CategoryDetailView({
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FiBookOpen className="w-10 h-10 text-muted-foreground mb-3" />
             <p className="text-muted-foreground font-medium">Nenhuma frase nesta categoria ainda.</p>
-            <p className="text-xs text-muted-foreground mt-1">Use o botao abaixo para gerar uma com IA!</p>
+            <p className="text-xs text-muted-foreground mt-2">Use o botao abaixo para gerar uma com IA!</p>
           </div>
         )}
       </ScrollArea>
@@ -952,7 +1040,7 @@ function FavoritesView({
                   onCardClick={onCardClick}
                 />
                 <button
-                  onClick={() => shareOnWhatsApp(phrase.text)}
+                  onClick={() => shareOnWhatsApp(phrase.text, phrase.imageUrl)}
                   className="absolute top-2 right-2 p-1.5 rounded-full bg-white/25 backdrop-blur-sm text-white hover:bg-white/40 transition-colors"
                 >
                   <FiShare2 className="w-3 h-3" />
@@ -1006,22 +1094,29 @@ function BottomNav({
 }
 
 // ─── Agent Status Section ────────────────────────────────────────────
-function AgentStatus({ activeAgentId }: { activeAgentId: string | null }) {
+function AgentStatus({ activeAgentId, generationStep }: { activeAgentId: string | null; generationStep: 'frase' | 'imagem' | null }) {
   return (
     <div className="px-4 pb-24">
       <div className="mt-4 p-3 rounded-[0.875rem] bg-white/60 backdrop-blur-sm border border-border">
         <div className="flex items-center gap-2 mb-2">
           <FiZap className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs font-semibold text-foreground">Agente de IA</span>
+          <span className="text-xs font-semibold text-foreground">Agentes de IA</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${activeAgentId ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
-          <span className="text-xs text-muted-foreground">
-            Gerador de Frases
-          </span>
-          <span className="text-[10px] text-muted-foreground ml-auto">
-            {activeAgentId ? 'Processando...' : 'Pronto'}
-          </span>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${generationStep === 'frase' ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
+            <span className="text-xs text-muted-foreground">Gerador de Frases</span>
+            <span className="text-[10px] text-muted-foreground ml-auto">
+              {generationStep === 'frase' ? 'Processando...' : 'Pronto'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${generationStep === 'imagem' ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
+            <span className="text-xs text-muted-foreground">Gerador de Imagens</span>
+            <span className="text-[10px] text-muted-foreground ml-auto">
+              {generationStep === 'imagem' ? 'Criando imagem...' : 'Pronto'}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -1040,6 +1135,7 @@ export default function Page() {
   const [showAISheet, setShowAISheet] = useState(false)
   const [aiCategoryName, setAICategoryName] = useState('Bom Dia')
   const [activeAgentId, setActiveAgentId] = useState<string | null>(null)
+  const [generationStep, setGenerationStep] = useState<'frase' | 'imagem' | null>(null)
 
   // Initialize greeting, favorites
   useEffect(() => {
@@ -1110,6 +1206,17 @@ export default function Page() {
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab)
     setSelectedCategory(null)
+  }, [])
+
+  const handleStepChange = useCallback((step: 'frase' | 'imagem' | null) => {
+    setGenerationStep(step)
+    if (step === 'frase') {
+      setActiveAgentId(AGENT_ID)
+    } else if (step === 'imagem') {
+      setActiveAgentId(IMAGE_AGENT_ID)
+    } else {
+      setActiveAgentId(null)
+    }
   }, [])
 
   // Determine which view to show
@@ -1191,7 +1298,7 @@ export default function Page() {
         <div className="h-screen flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             {renderContent()}
-            <AgentStatus activeAgentId={activeAgentId} />
+            <AgentStatus activeAgentId={activeAgentId} generationStep={generationStep} />
           </div>
         </div>
 
@@ -1216,6 +1323,7 @@ export default function Page() {
           onClose={() => setShowAISheet(false)}
           categoryName={aiCategoryName}
           onPhraseGenerated={handlePhraseGenerated}
+          onStepChange={handleStepChange}
         />
       </div>
     </ErrorBoundary>

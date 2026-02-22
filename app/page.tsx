@@ -1,12 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { callAIAgent } from '@/lib/aiAgent'
-import parseLLMJson from '@/lib/jsonParser'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -22,32 +19,38 @@ import {
   FiBookOpen,
   FiSmile,
   FiMusic,
-  FiZap,
   FiShare2,
   FiDownload,
   FiX,
   FiChevronLeft,
   FiChevronRight,
-  FiRefreshCw,
   FiArrowLeft,
   FiImage,
+  FiBell,
+  FiAward,
+  FiCheck,
+  FiLock,
 } from 'react-icons/fi'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 
+// ─── Agent IDs (kept as reference — agents used offline to pre-populate content) ──
+// const AGENT_ID = '699a74a9c2eec05acd279d41'
+// const IMAGE_AGENT_ID = '699a77b7b0da46f6ada21c31'
+
 // ─── Constants ───────────────────────────────────────────────────────
-const AGENT_ID = '699a74a9c2eec05acd279d41'
-const IMAGE_AGENT_ID = '699a77b7b0da46f6ada21c31'
 const FAVORITES_KEY = 'frases-favoritos'
+const PLAN_KEY = 'frases-user-plan'
 
 // ─── Types ───────────────────────────────────────────────────────────
+type UserPlan = 'free' | 'pro'
+
 interface Phrase {
   id: string
   text: string
   categoria: string
   emoji: string
   isNew?: boolean
-  isAIGenerated?: boolean
-  imageUrl?: string
+  imageUrl: string
   gradientIndex: number
   createdAt: number
 }
@@ -68,15 +71,6 @@ const CARD_GRADIENTS = [
   'linear-gradient(135deg, #d4a574 0%, #e8a87c 100%)',
 ]
 
-const CARD_TEXT_COLORS = [
-  'text-white',
-  'text-white',
-  'text-white',
-  'text-white',
-  'text-rose-900',
-  'text-white',
-]
-
 // ─── Categories ──────────────────────────────────────────────────────
 const CATEGORIES: Category[] = [
   { name: 'Bom Dia', icon: <FiSun className="w-4 h-4" />, description: 'Frases de bom dia' },
@@ -93,51 +87,82 @@ const CATEGORIES: Category[] = [
   { name: 'Sexta-feira', icon: <FiMusic className="w-4 h-4" />, description: 'Frases de sexta-feira' },
 ]
 
-// ─── Seed Phrases ────────────────────────────────────────────────────
-const SEED_PHRASES: Phrase[] = [
-  { id: 'sd01', text: 'Que o sol deste novo dia ilumine seus caminhos e aqueca seu coracao com esperanca e gratidao.', categoria: 'Bom Dia', emoji: '', gradientIndex: 0, createdAt: 1700000001000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&h=600&fit=crop' },
-  { id: 'sd02', text: 'Bom dia! Que cada passo de hoje te leve mais perto dos seus sonhos. A vida e bela demais para ser desperdicada.', categoria: 'Bom Dia', emoji: '', gradientIndex: 1, createdAt: 1700000002000 },
-  { id: 'sd03', text: 'Acorde com gratidao no coracao e um sorriso no rosto. Hoje e um presente que merece ser vivido intensamente.', categoria: 'Bom Dia', emoji: '', gradientIndex: 2, createdAt: 1700000003000 },
-  { id: 'sd04', text: 'Que a noite traga paz ao seu coracao e que os sonhos sejam tao lindos quanto voce merece.', categoria: 'Boa Noite', emoji: '', gradientIndex: 3, createdAt: 1700000004000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=600&h=600&fit=crop' },
-  { id: 'sd05', text: 'Boa noite! Descanse com a certeza de que amanha sera um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', gradientIndex: 4, createdAt: 1700000005000 },
-  { id: 'sd06', text: 'Durma em paz sabendo que voce fez o seu melhor hoje. O universo cuida de quem tem fe.', categoria: 'Boa Noite', emoji: '', gradientIndex: 5, createdAt: 1700000006000 },
-  { id: 'sd07', text: 'O amor e a forca mais poderosa do universo. Quando amamos de verdade, tudo se transforma.', categoria: 'Amor', emoji: '', gradientIndex: 0, createdAt: 1700000007000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&h=600&fit=crop' },
-  { id: 'sd08', text: 'Amar e encontrar no outro a metade que completa nosso coracao. Voce e o meu mundo inteiro.', categoria: 'Amor', emoji: '', gradientIndex: 1, createdAt: 1700000008000 },
-  { id: 'sd09', text: 'O verdadeiro amor nao conhece distancia, tempo ou obstaculos. Ele simplesmente existe e persiste.', categoria: 'Amor', emoji: '', gradientIndex: 2, createdAt: 1700000009000 },
-  { id: 'sd10', text: 'A fe move montanhas e transforma o impossivel em possivel. Confie sempre na vontade de Deus.', categoria: 'Fe', emoji: '', gradientIndex: 3, createdAt: 1700000010000, imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=600&fit=crop' },
-  { id: 'sd11', text: 'Quando a fe fala mais alto que o medo, milagres acontecem. Acredite no poder da sua oracao.', categoria: 'Fe', emoji: '', gradientIndex: 4, createdAt: 1700000011000, isNew: true },
-  { id: 'sd12', text: 'Entregue seus planos nas maos de Deus e Ele fara infinitamente mais do que voce pode imaginar.', categoria: 'Fe', emoji: '', gradientIndex: 5, createdAt: 1700000012000 },
-  { id: 'sd13', text: 'Feliz aniversario! Que este novo ciclo seja repleto de realizacoes, saude e muito amor.', categoria: 'Aniversario', emoji: '', gradientIndex: 0, createdAt: 1700000013000 },
-  { id: 'sd14', text: 'Parabens! Que cada ano que passa te traga mais sabedoria, alegria e motivos para sorrir.', categoria: 'Aniversario', emoji: '', gradientIndex: 1, createdAt: 1700000014000 },
-  { id: 'sd15', text: 'Neste dia especial, desejo que todos os seus sonhos ganhem asas e alcancem o ceu.', categoria: 'Aniversario', emoji: '', gradientIndex: 2, createdAt: 1700000015000, isNew: true },
-  { id: 'sd16', text: 'Amigos verdadeiros sao como estrelas: nem sempre os vemos, mas sabemos que estao la.', categoria: 'Amizade', emoji: '', gradientIndex: 3, createdAt: 1700000016000, imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop' },
-  { id: 'sd17', text: 'A amizade e um tesouro que o tempo nao desgasta. Obrigado por ser parte da minha historia.', categoria: 'Amizade', emoji: '', gradientIndex: 4, createdAt: 1700000017000 },
-  { id: 'sd18', text: 'Um amigo de verdade e aquele que te faz rir quando voce so quer chorar. Gratidao por voce!', categoria: 'Amizade', emoji: '', gradientIndex: 5, createdAt: 1700000018000, isNew: true },
-  { id: 'sd19', text: 'Familia e onde a vida comeca e o amor nunca termina. Nosso laco e eterno e inquebravel.', categoria: 'Familia', emoji: '', gradientIndex: 0, createdAt: 1700000019000, imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=600&fit=crop' },
-  { id: 'sd20', text: 'O maior patrimonio que possuimos e a nossa familia. Cuide com carinho de quem te ama.', categoria: 'Familia', emoji: '', gradientIndex: 1, createdAt: 1700000020000 },
-  { id: 'sd21', text: 'A vida e um espelho: reflete de volta o que voce mostra a ela. Escolha sempre o melhor.', categoria: 'Reflexao', emoji: '', gradientIndex: 2, createdAt: 1700000021000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop' },
-  { id: 'sd22', text: 'Nao espere o momento perfeito. Tome o momento e faca-o perfeito com sua atitude.', categoria: 'Reflexao', emoji: '', gradientIndex: 3, createdAt: 1700000022000 },
-  { id: 'sd23', text: 'Cada dia e uma nova chance de reescrever sua historia. Nao desista do seu capitulo mais bonito.', categoria: 'Reflexao', emoji: '', gradientIndex: 4, createdAt: 1700000023000 },
-  { id: 'sd24', text: 'Gratidao transforma o que temos em suficiente. Agradeca por cada bencao, grande ou pequena.', categoria: 'Gratidao', emoji: '', gradientIndex: 5, createdAt: 1700000024000 },
-  { id: 'sd25', text: 'Ser grato nao e apenas dizer obrigado, e viver reconhecendo que cada dia e um presente divino.', categoria: 'Gratidao', emoji: '', gradientIndex: 0, createdAt: 1700000025000, isNew: true },
-  { id: 'sd26', text: 'Deus nao te trouxe ate aqui para te abandonar. Confie no Seu plano, Ele sabe o que faz.', categoria: 'Religioso', emoji: '', gradientIndex: 1, createdAt: 1700000026000 },
-  { id: 'sd27', text: 'O Senhor e meu pastor e nada me faltara. Em verdes pastos me faz repousar. Salmo 23.', categoria: 'Religioso', emoji: '', gradientIndex: 2, createdAt: 1700000027000 },
-  { id: 'sd28', text: 'Porque Deus tanto amou o mundo que deu o Seu Filho, para que todo o que nele cre nao pereca.', categoria: 'Religioso', emoji: '', gradientIndex: 3, createdAt: 1700000028000, isNew: true },
-  { id: 'sd29', text: 'A vida e curta demais para nao rir das coisas bobas. Sorria, pois o riso e o melhor remedio!', categoria: 'Humor', emoji: '', gradientIndex: 4, createdAt: 1700000029000 },
-  { id: 'sd30', text: 'Se a vida te der limoes, faca uma caipirinha! Afinal, estamos no Brasil.', categoria: 'Humor', emoji: '', gradientIndex: 5, createdAt: 1700000030000 },
-  { id: 'sd31', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 0, createdAt: 1700000031000, isNew: true, imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=600&fit=crop' },
-  { id: 'sd32', text: 'Sextou! Que este final de semana seja regado de boas risadas, boa musica e muita paz.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 1, createdAt: 1700000032000 },
-  { id: 'sd33', text: 'A melhor hora da semana chegou! Bora celebrar a vida nesta sexta-feira maravilhosa.', categoria: 'Sexta-feira', emoji: '', gradientIndex: 2, createdAt: 1700000033000 },
-  { id: 'sd34', text: 'Bom dia! Lembre-se: voce e mais forte do que imagina e mais amado do que sabe.', categoria: 'Bom Dia', emoji: '', gradientIndex: 3, createdAt: 1700000034000 },
-  { id: 'sd35', text: 'O amor que a gente da e o unico que a gente leva. Ame sem medo, viva sem arrependimento.', categoria: 'Amor', emoji: '', gradientIndex: 4, createdAt: 1700000035000 },
-  { id: 'sd36', text: 'Familia nao e sobre sangue. E sobre quem esta disposto a segurar sua mao nos dias dificeis.', categoria: 'Familia', emoji: '', gradientIndex: 5, createdAt: 1700000036000, isNew: true },
+// ─── Content Bank (48 phrases) ──────────────────────────────────────
+const CONTENT_BANK: Phrase[] = [
+  // Bom Dia (4)
+  { id: 'bd01', text: 'Que o sol deste novo dia ilumine seus caminhos e aqueca seu coracao com esperanca e gratidao.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000001000, isNew: true },
+  { id: 'bd02', text: 'Bom dia! Que cada passo de hoje te leve mais perto dos seus sonhos. A vida e bela demais para ser desperdicada.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000002000 },
+  { id: 'bd03', text: 'Acorde com gratidao no coracao e um sorriso no rosto. Hoje e um presente que merece ser vivido intensamente.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000003000 },
+  { id: 'bd04', text: 'Bom dia! Lembre-se: voce e mais forte do que imagina e mais amado do que sabe.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000004000, isNew: true },
+
+  // Boa Noite (4)
+  { id: 'bn01', text: 'Que a noite traga paz ao seu coracao e que os sonhos sejam tao lindos quanto voce merece.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000005000, isNew: true },
+  { id: 'bn02', text: 'Boa noite! Descanse com a certeza de que amanha sera um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1475274047050-1d0c55b7b10c?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000006000 },
+  { id: 'bn03', text: 'Durma em paz sabendo que voce fez o seu melhor hoje. O universo cuida de quem tem fe.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000007000 },
+  { id: 'bn04', text: 'A noite e o momento de agradecer pelas bencaos do dia e confiar que amanha sera ainda melhor.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000008000, isNew: true },
+
+  // Amor (4)
+  { id: 'am01', text: 'O amor e a forca mais poderosa do universo. Quando amamos de verdade, tudo se transforma.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000009000, isNew: true },
+  { id: 'am02', text: 'Amar e encontrar no outro a metade que completa nosso coracao. Voce e o meu mundo inteiro.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000010000 },
+  { id: 'am03', text: 'O verdadeiro amor nao conhece distancia, tempo ou obstaculos. Ele simplesmente existe e persiste.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000011000 },
+  { id: 'am04', text: 'O amor que a gente da e o unico que a gente leva. Ame sem medo, viva sem arrependimento.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000012000, isNew: true },
+
+  // Fe (4)
+  { id: 'fe01', text: 'A fe move montanhas e transforma o impossivel em possivel. Confie sempre na vontade de Deus.', categoria: 'Fe', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000013000 },
+  { id: 'fe02', text: 'Quando a fe fala mais alto que o medo, milagres acontecem. Acredite no poder da sua oracao.', categoria: 'Fe', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000014000, isNew: true },
+  { id: 'fe03', text: 'Entregue seus planos nas maos de Deus e Ele fara infinitamente mais do que voce pode imaginar.', categoria: 'Fe', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000015000 },
+  { id: 'fe04', text: 'Nao tenha medo, pois Deus esta contigo em cada passo. A fe e o caminho que nos leva adiante.', categoria: 'Fe', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000016000 },
+
+  // Aniversario (4)
+  { id: 'an01', text: 'Feliz aniversario! Que este novo ciclo seja repleto de realizacoes, saude e muito amor.', categoria: 'Aniversario', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000017000 },
+  { id: 'an02', text: 'Parabens! Que cada ano que passa te traga mais sabedoria, alegria e motivos para sorrir.', categoria: 'Aniversario', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000018000, isNew: true },
+  { id: 'an03', text: 'Neste dia especial, desejo que todos os seus sonhos ganhem asas e alcancem o ceu.', categoria: 'Aniversario', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000019000 },
+  { id: 'an04', text: 'Que a vida te surpreenda com as maiores e mais bonitas bencaos. Feliz aniversario!', categoria: 'Aniversario', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000020000 },
+
+  // Amizade (4)
+  { id: 'az01', text: 'Amigos verdadeiros sao como estrelas: nem sempre os vemos, mas sabemos que estao la.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000021000 },
+  { id: 'az02', text: 'A amizade e um tesouro que o tempo nao desgasta. Obrigado por ser parte da minha historia.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1522543558187-768b6df7c25c?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000022000, isNew: true },
+  { id: 'az03', text: 'Um amigo de verdade e aquele que te faz rir quando voce so quer chorar. Gratidao por voce!', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000023000 },
+  { id: 'az04', text: 'A distancia nao separa amigos de verdade. O coracao sabe encurtar qualquer caminho.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76cb?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000024000 },
+
+  // Familia (4)
+  { id: 'fm01', text: 'Familia e onde a vida comeca e o amor nunca termina. Nosso laco e eterno e inquebravel.', categoria: 'Familia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000025000 },
+  { id: 'fm02', text: 'O maior patrimonio que possuimos e a nossa familia. Cuide com carinho de quem te ama.', categoria: 'Familia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000026000, isNew: true },
+  { id: 'fm03', text: 'Familia nao e sobre sangue. E sobre quem esta disposto a segurar sua mao nos dias dificeis.', categoria: 'Familia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000027000 },
+  { id: 'fm04', text: 'Lar e onde o coracao encontra paz. Minha familia e meu porto seguro.', categoria: 'Familia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1484665005710-1e86252a3fde?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000028000 },
+
+  // Reflexao (4)
+  { id: 'rf01', text: 'A vida e um espelho: reflete de volta o que voce mostra a ela. Escolha sempre o melhor.', categoria: 'Reflexao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000029000, isNew: true },
+  { id: 'rf02', text: 'Nao espere o momento perfeito. Tome o momento e faca-o perfeito com sua atitude.', categoria: 'Reflexao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000030000 },
+  { id: 'rf03', text: 'Cada dia e uma nova chance de reescrever sua historia. Nao desista do seu capitulo mais bonito.', categoria: 'Reflexao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000031000 },
+  { id: 'rf04', text: 'O segredo da vida nao e ter tudo que voce quer, mas amar tudo que voce tem.', categoria: 'Reflexao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000032000 },
+
+  // Gratidao (4)
+  { id: 'gr01', text: 'Gratidao transforma o que temos em suficiente. Agradeca por cada bencao, grande ou pequena.', categoria: 'Gratidao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000033000 },
+  { id: 'gr02', text: 'Ser grato nao e apenas dizer obrigado, e viver reconhecendo que cada dia e um presente divino.', categoria: 'Gratidao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000034000, isNew: true },
+  { id: 'gr03', text: 'Comece cada dia agradecendo. A gratidao abre portas que o dinheiro nao consegue abrir.', categoria: 'Gratidao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000035000 },
+  { id: 'gr04', text: 'A vida e feita de pequenos momentos que merecem nossa gratidao eterna.', categoria: 'Gratidao', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000036000 },
+
+  // Religioso (4)
+  { id: 'rg01', text: 'Deus nao te trouxe ate aqui para te abandonar. Confie no Seu plano, Ele sabe o que faz.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000037000 },
+  { id: 'rg02', text: 'O Senhor e meu pastor e nada me faltara. Em verdes pastos me faz repousar. Salmo 23.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000038000 },
+  { id: 'rg03', text: 'Porque Deus tanto amou o mundo que deu o Seu Filho, para que todo o que nele cre nao pereca.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000039000, isNew: true },
+  { id: 'rg04', text: 'Tudo posso naquele que me fortalece. A Sua graca me basta em todos os momentos.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000040000 },
+
+  // Humor (4)
+  { id: 'hm01', text: 'A vida e curta demais para nao rir das coisas bobas. Sorria, pois o riso e o melhor remedio!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000041000 },
+  { id: 'hm02', text: 'Se a vida te der limoes, faca uma caipirinha! Afinal, estamos no Brasil.', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000042000, isNew: true },
+  { id: 'hm03', text: 'Meu plano de dieta: como o que quiser e torco pra dar certo. Funcionou ate agora!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1517960413843-0aee8e2b3285?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000043000 },
+  { id: 'hm04', text: 'Nao e preguica, e modo economia de energia. O planeta agradece!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000044000 },
+
+  // Sexta-feira (4)
+  { id: 'sx01', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000045000, isNew: true },
+  { id: 'sx02', text: 'Sextou! Que este final de semana seja regado de boas risadas, boa musica e muita paz.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1496024840928-4c417adf211d?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000046000 },
+  { id: 'sx03', text: 'A melhor hora da semana chegou! Bora celebrar a vida nesta sexta-feira maravilhosa.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000047000 },
+  { id: 'sx04', text: 'Sexta e dia de agradecer pela semana e se preparar para um final de semana incrivel!', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1528495612343-9ca9f4a4de28?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000048000 },
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 8)
-}
-
 function getGreeting(hour: number): { text: string; icon: React.ReactNode } {
   if (hour >= 5 && hour < 12) {
     return { text: 'Bom Dia', icon: <FiSun className="w-6 h-6 text-amber-500" /> }
@@ -146,6 +171,16 @@ function getGreeting(hour: number): { text: string; icon: React.ReactNode } {
     return { text: 'Boa Tarde', icon: <FiSun className="w-6 h-6 text-orange-500" /> }
   }
   return { text: 'Boa Noite', icon: <FiMoon className="w-6 h-6 text-indigo-400" /> }
+}
+
+function loadPlan(): UserPlan {
+  if (typeof window === 'undefined') return 'free'
+  return (localStorage.getItem(PLAN_KEY) as UserPlan) || 'free'
+}
+
+function savePlan(plan: UserPlan) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(PLAN_KEY, plan)
 }
 
 function loadFavorites(): string[] {
@@ -208,14 +243,130 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-// ─── Loading Dots ────────────────────────────────────────────────────
-function LoadingDots() {
+// ─── Ad Slot Placeholder ────────────────────────────────────────────
+function AdSlot() {
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className="w-2 h-2 rounded-full bg-primary animate-bounce" />
-      <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.15s' }} />
-      <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.3s' }} />
-    </span>
+    <div className="col-span-2 my-2 py-6 px-4 rounded-[0.875rem] border-2 border-dashed border-border/50 bg-white/30 backdrop-blur-sm flex flex-col items-center justify-center gap-1">
+      <span className="text-xs text-muted-foreground/60 font-medium">Espaco publicitario</span>
+      <span className="text-[10px] text-muted-foreground/40">Ad</span>
+    </div>
+  )
+}
+
+// ─── Notification Banner ────────────────────────────────────────────
+function NotificationBanner({ onAccept, onDismiss }: { onAccept: () => void; onDismiss: () => void }) {
+  return (
+    <div className="mx-4 mb-3 p-3 rounded-[0.875rem] bg-primary/10 border border-primary/20 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+        <FiBell className="w-5 h-5 text-primary" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground">Receba frases todos os dias!</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Ative as notificacoes para nao perder nenhuma</p>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Button size="sm" className="text-xs h-7 px-3" onClick={onAccept}>Ativar</Button>
+        <button className="text-[10px] text-muted-foreground hover:text-foreground" onClick={onDismiss}>Agora nao</button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Pro Upsell Modal ───────────────────────────────────────────────
+function ProUpsellModal({
+  isOpen,
+  onClose,
+  onSubscribe,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  onSubscribe: () => void
+}) {
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className="sm:max-w-sm p-0 overflow-hidden border-0 bg-card">
+        <DialogTitle className="sr-only">Desbloqueie o Plano Pro</DialogTitle>
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <FiAward className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-serif font-bold text-xl text-foreground">Desbloqueie o Plano Pro</h3>
+            <p className="text-sm text-muted-foreground mt-1">Aproveite ao maximo o Frases & Imagens</p>
+          </div>
+
+          {/* Benefits */}
+          <div className="space-y-3 mb-6">
+            {[
+              'Imagens sem marca d\'agua',
+              'Salve seus favoritos',
+              'Sem anuncios',
+              'Novos conteudos exclusivos',
+            ].map((benefit) => (
+              <div key={benefit} className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <FiCheck className="w-3.5 h-3.5 text-green-600" />
+                </div>
+                <span className="text-sm text-foreground">{benefit}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Price */}
+          <div className="text-center mb-5 p-4 rounded-[0.875rem] bg-primary/5 border border-primary/10">
+            <span className="text-3xl font-bold text-foreground">R$ 9,90</span>
+            <span className="text-sm text-muted-foreground">/mes</span>
+          </div>
+
+          {/* CTA */}
+          <Button onClick={onSubscribe} className="w-full h-12 text-base font-semibold gap-2">
+            <FiAward className="w-5 h-5" />
+            Assinar Pro
+          </Button>
+          <button
+            onClick={onClose}
+            className="w-full mt-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-center"
+          >
+            Continuar gratis
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─── Pro Status Pill ────────────────────────────────────────────────
+function ProStatusPill({
+  isPro,
+  notifEnabled,
+  onClick,
+}: {
+  isPro: boolean
+  notifEnabled: boolean
+  onClick: () => void
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      {notifEnabled && (
+        <div className="p-1.5 rounded-full bg-primary/10" title="Notificacoes ativas">
+          <FiBell className="w-3.5 h-3.5 text-primary" />
+        </div>
+      )}
+      <button
+        onClick={onClick}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${isPro ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25' : 'bg-white/60 backdrop-blur-sm text-muted-foreground border border-border hover:bg-white/80'}`}
+      >
+        {isPro ? (
+          <>
+            <FiAward className="w-3.5 h-3.5" />
+            <span>PRO</span>
+          </>
+        ) : (
+          <span>Gratis</span>
+        )}
+      </button>
+    </div>
   )
 }
 
@@ -225,14 +376,15 @@ function PhraseCard({
   isFavorited,
   onToggleFavorite,
   onCardClick,
+  isPro,
 }: {
   phrase: Phrase
   isFavorited: boolean
   onToggleFavorite: (id: string) => void
   onCardClick: (phrase: Phrase) => void
+  isPro: boolean
 }) {
   const gradient = CARD_GRADIENTS[phrase.gradientIndex % CARD_GRADIENTS.length]
-  const textColorClass = CARD_TEXT_COLORS[phrase.gradientIndex % CARD_TEXT_COLORS.length]
   const hasImage = !!phrase.imageUrl
 
   return (
@@ -254,22 +406,12 @@ function PhraseCard({
               Novo
             </Badge>
           )}
-          {phrase.isAIGenerated && (
-            <Badge className="mb-2 ml-1 bg-white/25 text-white border-white/30 text-[10px] backdrop-blur-sm">
-              <FiZap className="w-3 h-3 mr-1" /> IA
-            </Badge>
-          )}
-          {hasImage && phrase.isAIGenerated && (
-            <Badge className="mb-2 ml-1 bg-white/25 text-white border-white/30 text-[10px] backdrop-blur-sm">
-              <FiImage className="w-3 h-3 mr-1" /> DALL-E
-            </Badge>
-          )}
-          <p className={`text-sm font-medium leading-relaxed tracking-tight ${hasImage ? 'text-white' : textColorClass}`} style={{ textShadow: hasImage ? '0 1px 4px rgba(0,0,0,0.5)' : (phrase.gradientIndex === 4 ? 'none' : '0 1px 3px rgba(0,0,0,0.2)') }}>
+          <p className="text-sm font-medium leading-relaxed tracking-tight text-white" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
             {phrase.text.length > 120 ? phrase.text.substring(0, 120) + '...' : phrase.text}
           </p>
         </div>
         <div className="flex items-center justify-between mt-3">
-          <span className={`text-xs font-medium opacity-80 ${hasImage ? 'text-white' : textColorClass}`}>
+          <span className="text-xs font-medium opacity-80 text-white">
             {phrase.categoria}
           </span>
           <button
@@ -282,11 +424,20 @@ function PhraseCard({
             {isFavorited ? (
               <FaHeart className="w-3.5 h-3.5 text-white" />
             ) : (
-              <FaRegHeart className={`w-3.5 h-3.5 ${hasImage ? 'text-white' : textColorClass}`} />
+              <FaRegHeart className="w-3.5 h-3.5 text-white" />
             )}
           </button>
         </div>
       </div>
+      {/* Watermark for free users */}
+      {!isPro && (
+        <div className="absolute bottom-1 right-2 z-10 flex items-center gap-1 opacity-50">
+          <FiImage className="w-2.5 h-2.5 text-white" />
+          <span className="text-[8px] text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+            Frases & Imagens
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -327,6 +478,8 @@ function FullScreenViewer({
   onToggleFavorite,
   onClose,
   onNavigate,
+  isPro,
+  onProUpsell,
 }: {
   phrase: Phrase
   phrases: Phrase[]
@@ -334,12 +487,37 @@ function FullScreenViewer({
   onToggleFavorite: (id: string) => void
   onClose: () => void
   onNavigate: (direction: 'prev' | 'next') => void
+  isPro: boolean
+  onProUpsell: () => void
 }) {
   const gradient = CARD_GRADIENTS[phrase.gradientIndex % CARD_GRADIENTS.length]
   const currentIndex = phrases.findIndex((p) => p.id === phrase.id)
   const hasPrev = currentIndex > 0
   const hasNext = currentIndex < phrases.length - 1
   const hasImage = !!phrase.imageUrl
+
+  const handleFavoriteClick = useCallback(() => {
+    if (!isPro) {
+      onProUpsell()
+      return
+    }
+    onToggleFavorite(phrase.id)
+  }, [isPro, onProUpsell, onToggleFavorite, phrase.id])
+
+  const handleDownloadClick = useCallback(() => {
+    if (!isPro) {
+      onProUpsell()
+      return
+    }
+    // Simulated download for pro users
+    if (phrase.imageUrl) {
+      const link = document.createElement('a')
+      link.href = phrase.imageUrl
+      link.target = '_blank'
+      link.download = `frase-${phrase.id}.jpg`
+      link.click()
+    }
+  }, [isPro, onProUpsell, phrase.imageUrl, phrase.id])
 
   return (
     <div
@@ -372,9 +550,6 @@ function FullScreenViewer({
             <p className="text-2xl md:text-3xl font-serif font-semibold text-white leading-relaxed tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
               &ldquo;{phrase.text}&rdquo;
             </p>
-            {phrase.emoji && (
-              <p className="mt-4 text-3xl">{phrase.emoji}</p>
-            )}
           </div>
         </div>
 
@@ -400,6 +575,16 @@ function FullScreenViewer({
           )}
         </div>
 
+        {/* Watermark for free users */}
+        {!isPro && (
+          <div className="absolute bottom-20 right-4 z-10 flex items-center gap-1.5 opacity-40">
+            <FiImage className="w-3 h-3 text-white" />
+            <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+              Frases & Imagens
+            </span>
+          </div>
+        )}
+
         {/* Bottom action bar */}
         <div className="p-4 pb-6">
           <div className="flex items-center justify-center gap-3 p-3 rounded-2xl bg-black/20 backdrop-blur-md max-w-md mx-auto">
@@ -411,264 +596,30 @@ function FullScreenViewer({
               Compartilhar
             </Button>
             <button
-              onClick={() => onToggleFavorite(phrase.id)}
-              className="p-3 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all duration-200 hover:scale-110"
+              onClick={handleFavoriteClick}
+              className="p-3 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all duration-200 hover:scale-110 relative"
             >
-              {isFavorited ? (
+              {isPro && isFavorited ? (
                 <FaHeart className="w-5 h-5" />
               ) : (
                 <FaRegHeart className="w-5 h-5" />
               )}
+              {!isPro && (
+                <FiLock className="w-2.5 h-2.5 absolute -top-0.5 -right-0.5 text-white" />
+              )}
             </button>
             <Button
-              onClick={() => {
-                // Simulated download
-              }}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+              onClick={handleDownloadClick}
+              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm relative"
             >
               <FiDownload className="w-4 h-4 mr-2" />
               Baixar
+              {!isPro && <FiLock className="w-3 h-3 ml-1 opacity-60" />}
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
-
-// ─── AI Generation Bottom Sheet ──────────────────────────────────────
-function AIGenerationSheet({
-  isOpen,
-  onClose,
-  categoryName,
-  onPhraseGenerated,
-  onStepChange,
-}: {
-  isOpen: boolean
-  onClose: () => void
-  categoryName: string
-  onPhraseGenerated: (phrase: Phrase) => void
-  onStepChange?: (step: 'frase' | 'imagem' | null) => void
-}) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [generatedPhrase, setGeneratedPhrase] = useState<Phrase | null>(null)
-  const [generationStep, setGenerationStep] = useState<'frase' | 'imagem' | null>(null)
-
-  const updateStep = useCallback((step: 'frase' | 'imagem' | null) => {
-    setGenerationStep(step)
-    onStepChange?.(step)
-  }, [onStepChange])
-
-  const handleGenerate = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    setGeneratedPhrase(null)
-    updateStep('frase')
-
-    try {
-      // STEP 1: Generate the phrase
-      const phraseMessage = `Gere uma frase inspiracional na categoria: ${categoryName}. Tom: inspiracional e emotivo. Responda em JSON com os campos: frase, categoria, emoji.`
-      const phraseResult = await callAIAgent(phraseMessage, AGENT_ID)
-
-      if (!phraseResult.success) {
-        setError(phraseResult?.error || 'Erro ao gerar frase. Tente novamente.')
-        setLoading(false)
-        updateStep(null)
-        return
-      }
-
-      let parsed = phraseResult?.response?.result
-      if (typeof parsed === 'string') {
-        parsed = parseLLMJson(parsed)
-      }
-      const frase = parsed?.frase || ''
-      const categoria = parsed?.categoria || categoryName
-      const emoji = parsed?.emoji || ''
-
-      if (!frase) {
-        setError('Nao foi possivel gerar a frase. Tente novamente.')
-        setLoading(false)
-        updateStep(null)
-        return
-      }
-
-      // STEP 2: Generate the image
-      updateStep('imagem')
-
-      const imageMessage = `Crie uma imagem artistica e bonita para acompanhar esta frase inspiracional. Categoria: ${categoria}. Frase: "${frase}". A imagem deve ser uma paisagem ou arte bonita que combine com o tema. NAO inclua texto na imagem. Estilo: fotorrealista, cores vibrantes, composicao impactante. Formato quadrado.`
-      const imageResult = await callAIAgent(imageMessage, IMAGE_AGENT_ID)
-
-      let imageUrl = ''
-      if (imageResult.success) {
-        // Image is at TOP LEVEL: result.module_outputs?.artifact_files
-        const artifactFiles = imageResult?.module_outputs?.artifact_files
-        if (Array.isArray(artifactFiles) && artifactFiles.length > 0) {
-          imageUrl = artifactFiles[0]?.file_url || ''
-        }
-      }
-      // Note: If image generation fails, we still show the phrase with a gradient fallback
-
-      const newPhrase: Phrase = {
-        id: generateId(),
-        text: frase,
-        categoria: categoria,
-        emoji: emoji,
-        isAIGenerated: true,
-        isNew: true,
-        imageUrl: imageUrl || undefined,
-        gradientIndex: Math.floor(Math.random() * CARD_GRADIENTS.length),
-        createdAt: Date.now(),
-      }
-      setGeneratedPhrase(newPhrase)
-    } catch {
-      setError('Erro de conexao. Tente novamente.')
-    } finally {
-      setLoading(false)
-      updateStep(null)
-    }
-  }, [categoryName, updateStep])
-
-  useEffect(() => {
-    if (isOpen && !generatedPhrase && !loading && !error) {
-      handleGenerate()
-    }
-  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSave = useCallback(() => {
-    if (generatedPhrase) {
-      onPhraseGenerated(generatedPhrase)
-      onClose()
-      setGeneratedPhrase(null)
-      setError(null)
-    }
-  }, [generatedPhrase, onPhraseGenerated, onClose])
-
-  const handleGenerateAnother = useCallback(() => {
-    setGeneratedPhrase(null)
-    setError(null)
-    handleGenerate()
-  }, [handleGenerate])
-
-  if (!isOpen) return null
-
-  const gradient = generatedPhrase
-    ? CARD_GRADIENTS[generatedPhrase.gradientIndex % CARD_GRADIENTS.length]
-    : CARD_GRADIENTS[0]
-
-  return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { onClose(); setGeneratedPhrase(null); setError(null); updateStep(null); } }}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0 bg-card">
-        <DialogTitle className="sr-only">Gerar Frase com IA</DialogTitle>
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <FiZap className="w-5 h-5 text-primary" />
-            <h3 className="font-serif font-semibold text-lg text-foreground">Gerar Frase com IA</h3>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Categoria: <span className="font-medium text-foreground">{categoryName}</span>
-          </p>
-
-          {loading && (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                {generationStep === 'imagem' ? (
-                  <FiImage className="w-6 h-6 text-primary animate-pulse" />
-                ) : (
-                  <FiZap className="w-6 h-6 text-primary animate-pulse" />
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                {generationStep === 'imagem' ? 'Criando imagem bonita...' : 'Gerando frase...'}
-              </p>
-              <LoadingDots />
-              {/* Step indicators */}
-              <div className="flex items-center gap-3 mt-4">
-                <div className={`flex items-center gap-1.5 text-xs ${generationStep === 'frase' ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${generationStep === 'frase' ? 'bg-primary animate-pulse' : generationStep === 'imagem' ? 'bg-green-500' : 'bg-muted'}`} />
-                  Frase
-                </div>
-                <div className="w-4 h-px bg-border" />
-                <div className={`flex items-center gap-1.5 text-xs ${generationStep === 'imagem' ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${generationStep === 'imagem' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
-                  Imagem
-                </div>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="py-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-                <FiX className="w-6 h-6 text-destructive" />
-              </div>
-              <p className="text-sm text-destructive mb-4">{error}</p>
-              <Button onClick={handleGenerate} variant="outline" className="gap-2">
-                <FiRefreshCw className="w-4 h-4" />
-                Tentar novamente
-              </Button>
-            </div>
-          )}
-
-          {generatedPhrase && !loading && !error && (
-            <div className="space-y-4">
-              <div
-                className="rounded-[0.875rem] overflow-hidden min-h-[220px] flex flex-col justify-end relative"
-                style={{
-                  background: generatedPhrase.imageUrl
-                    ? `url(${generatedPhrase.imageUrl})`
-                    : gradient,
-                  backgroundSize: generatedPhrase.imageUrl ? 'cover' : undefined,
-                  backgroundPosition: generatedPhrase.imageUrl ? 'center' : undefined,
-                }}
-              >
-                {/* Overlay for text readability */}
-                <div className={`absolute inset-0 ${generatedPhrase.imageUrl ? 'bg-gradient-to-t from-black/70 via-black/30 to-transparent' : ''}`} />
-                <div className="relative p-5">
-                  <p className="text-white font-serif font-medium text-base leading-relaxed tracking-tight text-center" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
-                    &ldquo;{generatedPhrase.text}&rdquo;
-                  </p>
-                  {generatedPhrase.emoji && (
-                    <p className="text-center mt-2 text-xl">{generatedPhrase.emoji}</p>
-                  )}
-                </div>
-              </div>
-              {generatedPhrase.imageUrl && (
-                <div className="flex items-center gap-1.5 justify-center">
-                  <FiImage className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Imagem gerada por DALL-E 3</span>
-                </div>
-              )}
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => shareOnWhatsApp(generatedPhrase.text, generatedPhrase.imageUrl)}
-                  variant="outline"
-                  className="flex-1 gap-2"
-                >
-                  <FiShare2 className="w-4 h-4" />
-                  Compartilhar
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  className="flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <FaHeart className="w-4 h-4" />
-                  Salvar
-                </Button>
-              </div>
-              <Button
-                onClick={handleGenerateAnother}
-                variant="ghost"
-                className="w-full gap-2 text-muted-foreground"
-              >
-                <FiZap className="w-4 h-4" />
-                Gerar outra
-              </Button>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -678,17 +629,25 @@ function HomeFeedView({
   favorites,
   onToggleFavorite,
   onCardClick,
-  onCategoryClick,
   greeting,
-  onRefresh,
+  isPro,
+  showNotifBanner,
+  onNotifAccept,
+  onNotifDismiss,
+  notifEnabled,
+  onProPillClick,
 }: {
   phrases: Phrase[]
   favorites: string[]
   onToggleFavorite: (id: string) => void
   onCardClick: (phrase: Phrase) => void
-  onCategoryClick: (cat: string) => void
   greeting: { text: string; icon: React.ReactNode }
-  onRefresh: () => void
+  isPro: boolean
+  showNotifBanner: boolean
+  onNotifAccept: () => void
+  onNotifDismiss: () => void
+  notifEnabled: boolean
+  onProPillClick: () => void
 }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
@@ -717,12 +676,7 @@ function HomeFeedView({
               <span className="text-sm text-muted-foreground font-medium">{greeting.text}!</span>
             </div>
           </div>
-          <button
-            onClick={onRefresh}
-            className="p-2 rounded-full bg-white/60 backdrop-blur-sm border border-border hover:bg-white/80 transition-colors"
-          >
-            <FiRefreshCw className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <ProStatusPill isPro={isPro} notifEnabled={notifEnabled} onClick={onProPillClick} />
         </div>
 
         {/* Category chips */}
@@ -751,24 +705,32 @@ function HomeFeedView({
         </div>
       </div>
 
+      {/* Notification Banner */}
+      {showNotifBanner && (
+        <NotificationBanner onAccept={onNotifAccept} onDismiss={onNotifDismiss} />
+      )}
+
       {/* Phrase grid */}
       <ScrollArea className="flex-1 px-4 pb-20">
         <div className="grid grid-cols-2 gap-3 pb-4">
-          {filteredPhrases.map((phrase) => (
-            <PhraseCard
-              key={phrase.id}
-              phrase={phrase}
-              isFavorited={favorites.includes(phrase.id)}
-              onToggleFavorite={onToggleFavorite}
-              onCardClick={onCardClick}
-            />
+          {filteredPhrases.map((phrase, idx) => (
+            <React.Fragment key={phrase.id}>
+              <PhraseCard
+                phrase={phrase}
+                isFavorited={favorites.includes(phrase.id)}
+                onToggleFavorite={onToggleFavorite}
+                onCardClick={onCardClick}
+                isPro={isPro}
+              />
+              {!isPro && (idx + 1) % 8 === 0 && idx < filteredPhrases.length - 1 && <AdSlot />}
+            </React.Fragment>
           ))}
         </div>
         {filteredPhrases.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FiBookOpen className="w-10 h-10 text-muted-foreground mb-3" />
             <p className="text-muted-foreground font-medium">Nenhuma frase nesta categoria.</p>
-            <p className="text-xs text-muted-foreground mt-1">Tente outra categoria ou gere uma com IA!</p>
+            <p className="text-xs text-muted-foreground mt-1">Tente outra categoria!</p>
           </div>
         )}
       </ScrollArea>
@@ -779,15 +741,9 @@ function HomeFeedView({
 // ─── Categories Grid View ────────────────────────────────────────────
 function CategoriesGridView({
   phrases,
-  favorites,
-  onToggleFavorite,
-  onCardClick,
   onCategorySelect,
 }: {
   phrases: Phrase[]
-  favorites: string[]
-  onToggleFavorite: (id: string) => void
-  onCardClick: (phrase: Phrase) => void
   onCategorySelect: (name: string) => void
 }) {
   const categoryCounts = useMemo(() => {
@@ -844,7 +800,7 @@ function CategoryDetailView({
   onToggleFavorite,
   onCardClick,
   onBack,
-  onGeneratePhrase,
+  isPro,
 }: {
   categoryName: string
   phrases: Phrase[]
@@ -852,7 +808,7 @@ function CategoryDetailView({
   onToggleFavorite: (id: string) => void
   onCardClick: (phrase: Phrase) => void
   onBack: () => void
-  onGeneratePhrase: () => void
+  isPro: boolean
 }) {
   const categoryPhrases = useMemo(
     () => phrases.filter((p) => p.categoria === categoryName),
@@ -880,34 +836,28 @@ function CategoryDetailView({
       </div>
 
       {/* Grid */}
-      <ScrollArea className="flex-1 px-4 pb-24">
+      <ScrollArea className="flex-1 px-4 pb-20">
         <div className="grid grid-cols-2 gap-3 pb-4">
-          {categoryPhrases.map((phrase) => (
-            <PhraseCard
-              key={phrase.id}
-              phrase={phrase}
-              isFavorited={favorites.includes(phrase.id)}
-              onToggleFavorite={onToggleFavorite}
-              onCardClick={onCardClick}
-            />
+          {categoryPhrases.map((phrase, idx) => (
+            <React.Fragment key={phrase.id}>
+              <PhraseCard
+                phrase={phrase}
+                isFavorited={favorites.includes(phrase.id)}
+                onToggleFavorite={onToggleFavorite}
+                onCardClick={onCardClick}
+                isPro={isPro}
+              />
+              {!isPro && (idx + 1) % 8 === 0 && idx < categoryPhrases.length - 1 && <AdSlot />}
+            </React.Fragment>
           ))}
         </div>
         {categoryPhrases.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FiBookOpen className="w-10 h-10 text-muted-foreground mb-3" />
             <p className="text-muted-foreground font-medium">Nenhuma frase nesta categoria ainda.</p>
-            <p className="text-xs text-muted-foreground mt-2">Use o botao abaixo para gerar uma com IA!</p>
           </div>
         )}
       </ScrollArea>
-
-      {/* FAB */}
-      <button
-        onClick={onGeneratePhrase}
-        className="absolute bottom-24 right-4 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 transition-transform duration-200 animate-pulse"
-      >
-        <FiZap className="w-6 h-6" />
-      </button>
     </div>
   )
 }
@@ -918,11 +868,13 @@ function SearchView({
   favorites,
   onToggleFavorite,
   onCardClick,
+  isPro,
 }: {
   phrases: Phrase[]
   favorites: string[]
   onToggleFavorite: (id: string) => void
   onCardClick: (phrase: Phrase) => void
+  isPro: boolean
 }) {
   const [query, setQuery] = useState('')
   const suggestions = ['bom dia', 'Deus', 'saudade', 'aniversario', 'amor', 'fe']
@@ -977,6 +929,7 @@ function SearchView({
               isFavorited={favorites.includes(phrase.id)}
               onToggleFavorite={onToggleFavorite}
               onCardClick={onCardClick}
+              isPro={isPro}
             />
           ))}
         </div>
@@ -1005,11 +958,15 @@ function FavoritesView({
   favorites,
   onToggleFavorite,
   onCardClick,
+  isPro,
+  onProUpsell,
 }: {
   phrases: Phrase[]
   favorites: string[]
   onToggleFavorite: (id: string) => void
   onCardClick: (phrase: Phrase) => void
+  isPro: boolean
+  onProUpsell: () => void
 }) {
   const favoritePhrases = useMemo(
     () => phrases.filter((p) => favorites.includes(p.id)),
@@ -1022,14 +979,27 @@ function FavoritesView({
         <div className="flex items-center gap-2">
           <FaHeart className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-serif font-bold text-foreground tracking-tight">Favoritos</h2>
-          {favoritePhrases.length > 0 && (
+          {isPro && favoritePhrases.length > 0 && (
             <Badge variant="secondary" className="text-xs">{favoritePhrases.length}</Badge>
           )}
         </div>
       </div>
 
       <ScrollArea className="flex-1 px-4 pb-20">
-        {favoritePhrases.length > 0 ? (
+        {!isPro ? (
+          /* Free user upsell */
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <FiLock className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-lg font-serif font-semibold text-foreground mb-2">Recurso exclusivo Pro</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs">Assine o plano Pro para salvar suas frases favoritas e acessa-las sempre que quiser!</p>
+            <Button onClick={onProUpsell} className="gap-2">
+              <FiAward className="w-4 h-4" />
+              Conhecer o Pro
+            </Button>
+          </div>
+        ) : favoritePhrases.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 pb-4">
             {favoritePhrases.map((phrase) => (
               <div key={phrase.id} className="relative">
@@ -1038,6 +1008,7 @@ function FavoritesView({
                   isFavorited={true}
                   onToggleFavorite={onToggleFavorite}
                   onCardClick={onCardClick}
+                  isPro={isPro}
                 />
                 <button
                   onClick={() => shareOnWhatsApp(phrase.text, phrase.imageUrl)}
@@ -1093,73 +1064,111 @@ function BottomNav({
   )
 }
 
-// ─── Agent Status Section ────────────────────────────────────────────
-function AgentStatus({ activeAgentId, generationStep }: { activeAgentId: string | null; generationStep: 'frase' | 'imagem' | null }) {
+// ─── Pro Confirmation Dialog ────────────────────────────────────────
+function ProConfirmationDialog({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean
+  onClose: () => void
+}) {
   return (
-    <div className="px-4 pb-24">
-      <div className="mt-4 p-3 rounded-[0.875rem] bg-white/60 backdrop-blur-sm border border-border">
-        <div className="flex items-center gap-2 mb-2">
-          <FiZap className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs font-semibold text-foreground">Agentes de IA</span>
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${generationStep === 'frase' ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
-            <span className="text-xs text-muted-foreground">Gerador de Frases</span>
-            <span className="text-[10px] text-muted-foreground ml-auto">
-              {generationStep === 'frase' ? 'Processando...' : 'Pronto'}
-            </span>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className="sm:max-w-xs p-0 overflow-hidden border-0 bg-card">
+        <DialogTitle className="sr-only">Voce e Pro</DialogTitle>
+        <div className="p-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+            <FiAward className="w-8 h-8 text-primary" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${generationStep === 'imagem' ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
-            <span className="text-xs text-muted-foreground">Gerador de Imagens</span>
-            <span className="text-[10px] text-muted-foreground ml-auto">
-              {generationStep === 'imagem' ? 'Criando imagem...' : 'Pronto'}
-            </span>
-          </div>
+          <h3 className="font-serif font-bold text-lg text-foreground mb-1">Voce e Pro!</h3>
+          <p className="text-sm text-muted-foreground mb-4">Aproveite todos os recursos sem restricoes.</p>
+          <Button onClick={onClose} className="w-full">Entendi</Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
 // ─── Main Page ───────────────────────────────────────────────────────
 export default function Page() {
-  const [phrases, setPhrases] = useState<Phrase[]>([])
+  const [phrases] = useState<Phrase[]>(CONTENT_BANK)
   const [favorites, setFavorites] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState('home')
   const [selectedPhrase, setSelectedPhrase] = useState<Phrase | null>(null)
-  const [showSampleData, setShowSampleData] = useState(false)
   const [greeting, setGreeting] = useState<{ text: string; icon: React.ReactNode }>({ text: 'Bom Dia', icon: <FiSun className="w-6 h-6 text-amber-500" /> })
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [showAISheet, setShowAISheet] = useState(false)
-  const [aiCategoryName, setAICategoryName] = useState('Bom Dia')
-  const [activeAgentId, setActiveAgentId] = useState<string | null>(null)
-  const [generationStep, setGenerationStep] = useState<'frase' | 'imagem' | null>(null)
 
-  // Initialize greeting, favorites
+  // Plan state
+  const [isPro, setIsPro] = useState(false)
+  const [showProModal, setShowProModal] = useState(false)
+  const [showProConfirm, setShowProConfirm] = useState(false)
+
+  // Notification state
+  const [showNotifBanner, setShowNotifBanner] = useState(false)
+  const [notifEnabled, setNotifEnabled] = useState(false)
+
+  // Initialize greeting, favorites, plan, notifications
   useEffect(() => {
     const hour = new Date().getHours()
     setGreeting(getGreeting(hour))
     setFavorites(loadFavorites())
+
+    const plan = loadPlan()
+    setIsPro(plan === 'pro')
+
+    const asked = localStorage.getItem('frases-notif-asked')
+    const enabled = localStorage.getItem('frases-notif-enabled')
+    if (enabled === 'true') setNotifEnabled(true)
+    if (!asked && !enabled) setShowNotifBanner(true)
   }, [])
 
-  // Toggle sample data
-  useEffect(() => {
-    if (showSampleData) {
-      setPhrases(SEED_PHRASES)
-    } else {
-      setPhrases([])
+  // Notification handlers
+  const handleNotifAccept = useCallback(() => {
+    if ('Notification' in window) {
+      Notification.requestPermission().then((perm) => {
+        if (perm === 'granted') {
+          localStorage.setItem('frases-notif-enabled', 'true')
+          setNotifEnabled(true)
+        }
+      })
     }
-  }, [showSampleData])
+    localStorage.setItem('frases-notif-asked', 'true')
+    setShowNotifBanner(false)
+  }, [])
 
+  const handleNotifDismiss = useCallback(() => {
+    localStorage.setItem('frases-notif-asked', 'true')
+    setShowNotifBanner(false)
+  }, [])
+
+  // Pro subscription handler
+  const handleSubscribe = useCallback(() => {
+    savePlan('pro')
+    setIsPro(true)
+    setShowProModal(false)
+  }, [])
+
+  // Pro pill click handler
+  const handleProPillClick = useCallback(() => {
+    if (isPro) {
+      setShowProConfirm(true)
+    } else {
+      setShowProModal(true)
+    }
+  }, [isPro])
+
+  // Favorite handler (gated behind isPro)
   const toggleFavorite = useCallback((id: string) => {
+    if (!isPro) {
+      setShowProModal(true)
+      return
+    }
     setFavorites((prev) => {
       const next = prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
       saveFavorites(next)
       return next
     })
-  }, [])
+  }, [isPro])
 
   const handleCardClick = useCallback((phrase: Phrase) => {
     setSelectedPhrase(phrase)
@@ -1182,41 +1191,9 @@ export default function Page() {
     setSelectedCategory(name)
   }, [])
 
-  const handleGeneratePhrase = useCallback((categoryName: string) => {
-    setAICategoryName(categoryName)
-    setShowAISheet(true)
-  }, [])
-
-  const handlePhraseGenerated = useCallback((phrase: Phrase) => {
-    setPhrases((prev) => [phrase, ...prev])
-  }, [])
-
-  const handleRefresh = useCallback(() => {
-    // Shuffle the order
-    setPhrases((prev) => {
-      const shuffled = [...prev]
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-      }
-      return shuffled
-    })
-  }, [])
-
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab)
     setSelectedCategory(null)
-  }, [])
-
-  const handleStepChange = useCallback((step: 'frase' | 'imagem' | null) => {
-    setGenerationStep(step)
-    if (step === 'frase') {
-      setActiveAgentId(AGENT_ID)
-    } else if (step === 'imagem') {
-      setActiveAgentId(IMAGE_AGENT_ID)
-    } else {
-      setActiveAgentId(null)
-    }
   }, [])
 
   // Determine which view to show
@@ -1231,7 +1208,7 @@ export default function Page() {
           onToggleFavorite={toggleFavorite}
           onCardClick={handleCardClick}
           onBack={() => setSelectedCategory(null)}
-          onGeneratePhrase={() => handleGeneratePhrase(selectedCategory)}
+          isPro={isPro}
         />
       )
     }
@@ -1244,18 +1221,19 @@ export default function Page() {
             favorites={favorites}
             onToggleFavorite={toggleFavorite}
             onCardClick={handleCardClick}
-            onCategoryClick={handleCategorySelect}
             greeting={greeting}
-            onRefresh={handleRefresh}
+            isPro={isPro}
+            showNotifBanner={showNotifBanner}
+            onNotifAccept={handleNotifAccept}
+            onNotifDismiss={handleNotifDismiss}
+            notifEnabled={notifEnabled}
+            onProPillClick={handleProPillClick}
           />
         )
       case 'categories':
         return (
           <CategoriesGridView
             phrases={phrases}
-            favorites={favorites}
-            onToggleFavorite={toggleFavorite}
-            onCardClick={handleCardClick}
             onCategorySelect={handleCategorySelect}
           />
         )
@@ -1266,6 +1244,7 @@ export default function Page() {
             favorites={favorites}
             onToggleFavorite={toggleFavorite}
             onCardClick={handleCardClick}
+            isPro={isPro}
           />
         )
       case 'favorites':
@@ -1275,6 +1254,8 @@ export default function Page() {
             favorites={favorites}
             onToggleFavorite={toggleFavorite}
             onCardClick={handleCardClick}
+            isPro={isPro}
+            onProUpsell={() => setShowProModal(true)}
           />
         )
       default:
@@ -1285,20 +1266,10 @@ export default function Page() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background text-foreground font-sans max-w-lg mx-auto relative">
-        {/* Sample Data Toggle */}
-        <div className="fixed top-3 right-3 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-xl border border-border shadow-sm">
-          <span className="text-xs font-medium text-muted-foreground">Sample Data</span>
-          <Switch
-            checked={showSampleData}
-            onCheckedChange={setShowSampleData}
-          />
-        </div>
-
         {/* Main content area */}
         <div className="h-screen flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             {renderContent()}
-            <AgentStatus activeAgentId={activeAgentId} generationStep={generationStep} />
           </div>
         </div>
 
@@ -1314,16 +1285,22 @@ export default function Page() {
             onToggleFavorite={toggleFavorite}
             onClose={() => setSelectedPhrase(null)}
             onNavigate={handleNavigate}
+            isPro={isPro}
+            onProUpsell={() => setShowProModal(true)}
           />
         )}
 
-        {/* AI Generation Sheet */}
-        <AIGenerationSheet
-          isOpen={showAISheet}
-          onClose={() => setShowAISheet(false)}
-          categoryName={aiCategoryName}
-          onPhraseGenerated={handlePhraseGenerated}
-          onStepChange={handleStepChange}
+        {/* Pro Upsell Modal */}
+        <ProUpsellModal
+          isOpen={showProModal}
+          onClose={() => setShowProModal(false)}
+          onSubscribe={handleSubscribe}
+        />
+
+        {/* Pro Confirmation Dialog */}
+        <ProConfirmationDialog
+          isOpen={showProConfirm}
+          onClose={() => setShowProConfirm(false)}
         />
       </div>
     </ErrorBoundary>

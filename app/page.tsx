@@ -111,77 +111,77 @@ const CATEGORIES: Category[] = [
 
 // ─── Content Bank (48 phrases) ──────────────────────────────────────
 const CONTENT_BANK: Phrase[] = [
-  // Bom Dia (4)
+  // Bom Dia (4) — sunrise, golden light, sunflowers, morning dew
   { id: 'bd01', text: 'Que o sol deste novo dia ilumine seus caminhos e aque\u00e7a seu cora\u00e7\u00e3o com esperan\u00e7a e gratid\u00e3o.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000001000, isNew: true },
   { id: 'bd02', text: 'Bom dia! Que cada passo de hoje te leve mais perto dos seus sonhos. A vida \u00e9 bela demais para ser desperdi\u00e7ada.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000002000 },
   { id: 'bd03', text: 'Acorde com gratid\u00e3o no cora\u00e7\u00e3o e um sorriso no rosto. Hoje \u00e9 um presente que merece ser vivido intensamente.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000003000 },
-  { id: 'bd04', text: 'Bom dia! Lembre-se: voc\u00ea \u00e9 mais forte do que imagina e mais amado do que sabe.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000004000, isNew: true },
+  { id: 'bd04', text: 'Bom dia! Lembre-se: voc\u00ea \u00e9 mais forte do que imagina e mais amado do que sabe.', categoria: 'Bom Dia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1501973801540-537f08ccae7b?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000004000, isNew: true },
 
-  // Boa Noite (4)
+  // Boa Noite (4) — starry sky, moon, twilight, night landscapes
   { id: 'bn01', text: 'Que a noite traga paz ao seu cora\u00e7\u00e3o e que os sonhos sejam t\u00e3o lindos quanto voc\u00ea merece.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000005000, isNew: true },
   { id: 'bn02', text: 'Boa noite! Descanse com a certeza de que amanh\u00e3 ser\u00e1 um dia cheio de novas possibilidades.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000006000 },
   { id: 'bn03', text: 'Durma em paz sabendo que voc\u00ea fez o seu melhor hoje. O universo cuida de quem tem f\u00e9.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000007000 },
   { id: 'bn04', text: 'A noite \u00e9 o momento de agradecer pelas b\u00ean\u00e7\u00e3os do dia e confiar que amanh\u00e3 ser\u00e1 ainda melhor.', categoria: 'Boa Noite', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000008000, isNew: true },
 
-  // Amor (4)
+  // Amor (4) — roses, sunset couples, hearts, romantic landscapes
   { id: 'am01', text: 'O amor \u00e9 a for\u00e7a mais poderosa do universo. Quando amamos de verdade, tudo se transforma.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000009000, isNew: true },
   { id: 'am02', text: 'Amar \u00e9 encontrar no outro a metade que completa nosso cora\u00e7\u00e3o. Voc\u00ea \u00e9 o meu mundo inteiro.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000010000 },
   { id: 'am03', text: 'O verdadeiro amor n\u00e3o conhece dist\u00e2ncia, tempo ou obst\u00e1culos. Ele simplesmente existe e persiste.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000011000 },
-  { id: 'am04', text: 'O amor que a gente d\u00e1 \u00e9 o \u00fanico que a gente leva. Ame sem medo, viva sem arrependimento.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000012000, isNew: true },
+  { id: 'am04', text: 'O amor que a gente d\u00e1 \u00e9 o \u00fanico que a gente leva. Ame sem medo, viva sem arrependimento.', categoria: 'Amor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1494972308805-463bc619d34e?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000012000, isNew: true },
 
-  // Fe (4)
-  { id: 'fe01', text: 'A f\u00e9 move montanhas e transforma o imposs\u00edvel em poss\u00edvel. Confie sempre na vontade de Deus.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000013000 },
+  // Fe (4) — light rays through clouds, mountains, sunrise over hills, sky
+  { id: 'fe01', text: 'A f\u00e9 move montanhas e transforma o imposs\u00edvel em poss\u00edvel. Confie sempre na vontade de Deus.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000013000 },
   { id: 'fe02', text: 'Quando a f\u00e9 fala mais alto que o medo, milagres acontecem. Acredite no poder da sua ora\u00e7\u00e3o.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000014000, isNew: true },
   { id: 'fe03', text: 'Entregue seus planos nas m\u00e3os de Deus e Ele far\u00e1 infinitamente mais do que voc\u00ea pode imaginar.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000015000 },
-  { id: 'fe04', text: 'N\u00e3o tenha medo, pois Deus est\u00e1 contigo em cada passo. A f\u00e9 \u00e9 o caminho que nos leva adiante.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000016000 },
+  { id: 'fe04', text: 'N\u00e3o tenha medo, pois Deus est\u00e1 contigo em cada passo. A f\u00e9 \u00e9 o caminho que nos leva adiante.', categoria: 'F\u00e9', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000016000 },
 
-  // Aniversario (4)
+  // Aniversario (4) — balloons, confetti, cakes, celebrations
   { id: 'an01', text: 'Feliz anivers\u00e1rio! Que este novo ciclo seja repleto de realiza\u00e7\u00f5es, sa\u00fade e muito amor.', categoria: 'Anivers\u00e1rio', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000017000 },
   { id: 'an02', text: 'Parab\u00e9ns! Que cada ano que passa te traga mais sabedoria, alegria e motivos para sorrir.', categoria: 'Anivers\u00e1rio', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000018000, isNew: true },
   { id: 'an03', text: 'Neste dia especial, desejo que todos os seus sonhos ganhem asas e alcancem o c\u00e9u.', categoria: 'Anivers\u00e1rio', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000019000 },
   { id: 'an04', text: 'Que a vida te surpreenda com as maiores e mais bonitas b\u00ean\u00e7\u00e3os. Feliz anivers\u00e1rio!', categoria: 'Anivers\u00e1rio', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000020000 },
 
-  // Amizade (4)
+  // Amizade (4) — friends laughing, group hugs, hands together
   { id: 'az01', text: 'Amigos verdadeiros s\u00e3o como estrelas: nem sempre os vemos, mas sabemos que est\u00e3o l\u00e1.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000021000 },
   { id: 'az02', text: 'A amizade \u00e9 um tesouro que o tempo n\u00e3o desgasta. Obrigado por ser parte da minha hist\u00f3ria.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1522543558187-768b6df7c25c?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000022000, isNew: true },
   { id: 'az03', text: 'Um amigo de verdade \u00e9 aquele que te faz rir quando voc\u00ea s\u00f3 quer chorar. Gratid\u00e3o por voc\u00ea!', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000023000 },
-  { id: 'az04', text: 'A dist\u00e2ncia n\u00e3o separa amigos de verdade. O cora\u00e7\u00e3o sabe encurtar qualquer caminho.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000024000 },
+  { id: 'az04', text: 'A dist\u00e2ncia n\u00e3o separa amigos de verdade. O cora\u00e7\u00e3o sabe encurtar qualquer caminho.', categoria: 'Amizade', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1516939884455-1445c8652f83?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000024000 },
 
-  // Familia (4)
+  // Familia (4) — families together, hands holding, warm homes
   { id: 'fm01', text: 'Fam\u00edlia \u00e9 onde a vida come\u00e7a e o amor nunca termina. Nosso la\u00e7o \u00e9 eterno e inquebr\u00e1vel.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000025000 },
   { id: 'fm02', text: 'O maior patrim\u00f4nio que possu\u00edmos \u00e9 a nossa fam\u00edlia. Cuide com carinho de quem te ama.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000026000, isNew: true },
   { id: 'fm03', text: 'Fam\u00edlia n\u00e3o \u00e9 sobre sangue. \u00c9 sobre quem est\u00e1 disposto a segurar sua m\u00e3o nos dias dif\u00edceis.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000027000 },
   { id: 'fm04', text: 'Lar \u00e9 onde o cora\u00e7\u00e3o encontra paz. Minha fam\u00edlia \u00e9 meu porto seguro.', categoria: 'Fam\u00edlia', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000028000 },
 
-  // Reflexao (4)
-  { id: 'rf01', text: 'A vida \u00e9 um espelho: reflete de volta o que voc\u00ea mostra a ela. Escolha sempre o melhor.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000029000, isNew: true },
+  // Reflexao (4) — calm lakes, mountain paths, forests, waterfalls
+  { id: 'rf01', text: 'A vida \u00e9 um espelho: reflete de volta o que voc\u00ea mostra a ela. Escolha sempre o melhor.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000029000, isNew: true },
   { id: 'rf02', text: 'N\u00e3o espere o momento perfeito. Tome o momento e fa\u00e7a-o perfeito com sua atitude.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000030000 },
-  { id: 'rf03', text: 'Cada dia \u00e9 uma nova chance de reescrever sua hist\u00f3ria. N\u00e3o desista do seu cap\u00edtulo mais bonito.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000031000 },
-  { id: 'rf04', text: 'O segredo da vida n\u00e3o \u00e9 ter tudo que voc\u00ea quer, mas amar tudo que voc\u00ea tem.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000032000 },
+  { id: 'rf03', text: 'Cada dia \u00e9 uma nova chance de reescrever sua hist\u00f3ria. N\u00e3o desista do seu cap\u00edtulo mais bonito.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000031000 },
+  { id: 'rf04', text: 'O segredo da vida n\u00e3o \u00e9 ter tudo que voc\u00ea quer, mas amar tudo que voc\u00ea tem.', categoria: 'Reflex\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000032000 },
 
-  // Gratidao (4)
-  { id: 'gr01', text: 'Gratid\u00e3o transforma o que temos em suficiente. Agrade\u00e7a por cada b\u00ean\u00e7\u00e3o, grande ou pequena.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000033000 },
+  // Gratidao (4) — sunflowers, blooming flowers, golden light, nature
+  { id: 'gr01', text: 'Gratid\u00e3o transforma o que temos em suficiente. Agrade\u00e7a por cada b\u00ean\u00e7\u00e3o, grande ou pequena.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000033000 },
   { id: 'gr02', text: 'Ser grato n\u00e3o \u00e9 apenas dizer obrigado, \u00e9 viver reconhecendo que cada dia \u00e9 um presente divino.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000034000, isNew: true },
-  { id: 'gr03', text: 'Comece cada dia agradecendo. A gratid\u00e3o abre portas que o dinheiro n\u00e3o consegue abrir.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000035000 },
-  { id: 'gr04', text: 'A vida \u00e9 feita de pequenos momentos que merecem nossa gratid\u00e3o eterna.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000036000 },
+  { id: 'gr03', text: 'Comece cada dia agradecendo. A gratid\u00e3o abre portas que o dinheiro n\u00e3o consegue abrir.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000035000 },
+  { id: 'gr04', text: 'A vida \u00e9 feita de pequenos momentos que merecem nossa gratid\u00e3o eterna.', categoria: 'Gratid\u00e3o', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000036000 },
 
-  // Religioso (4)
+  // Religioso (4) — church, cross, bible, light through stained glass
   { id: 'rg01', text: 'Deus n\u00e3o te trouxe at\u00e9 aqui para te abandonar. Confie no Seu plano, Ele sabe o que faz.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000037000 },
   { id: 'rg02', text: 'O Senhor \u00e9 meu pastor e nada me faltar\u00e1. Em verdes pastos me faz repousar. Salmo 23.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000038000 },
   { id: 'rg03', text: 'Porque Deus tanto amou o mundo que deu o Seu Filho, para que todo o que nele cr\u00ea n\u00e3o pere\u00e7a.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000039000, isNew: true },
   { id: 'rg04', text: 'Tudo posso naquele que me fortalece. A Sua gra\u00e7a me basta em todos os momentos.', categoria: 'Religioso', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000040000 },
 
-  // Humor (4)
+  // Humor (4) — colorful, bright, fun, tropical
   { id: 'hm01', text: 'A vida \u00e9 curta demais para n\u00e3o rir das coisas bobas. Sorria, pois o riso \u00e9 o melhor rem\u00e9dio!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?w=600&h=600&fit=crop', gradientIndex: 4, createdAt: 1700000041000 },
   { id: 'hm02', text: 'Se a vida te der lim\u00f5es, fa\u00e7a uma caipirinha! Afinal, estamos no Brasil.', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=600&h=600&fit=crop', gradientIndex: 5, createdAt: 1700000042000, isNew: true },
   { id: 'hm03', text: 'Meu plano de dieta: como o que quiser e tor\u00e7o pra dar certo. Funcionou at\u00e9 agora!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1517960413843-0aee8e2b3285?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000043000 },
   { id: 'hm04', text: 'N\u00e3o \u00e9 pregui\u00e7a, \u00e9 modo economia de energia. O planeta agradece!', categoria: 'Humor', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000044000 },
 
-  // Sexta-feira (4)
-  { id: 'sx01', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000045000, isNew: true },
-  { id: 'sx02', text: 'Sextou! Que este final de semana seja regado de boas risadas, boa m\u00fasica e muita paz.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1496024840928-4c417adf211d?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000046000 },
-  { id: 'sx03', text: 'A melhor hora da semana chegou! Bora celebrar a vida nesta sexta-feira maravilhosa.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000047000 },
-  { id: 'sx04', text: 'Sexta \u00e9 dia de agradecer pela semana e se preparar para um final de semana incr\u00edvel!', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1528495612343-9ca9f4a4de28?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000048000 },
+  // Sexta-feira (4) — beach sunset, tropical drinks, palm trees, party lights
+  { id: 'sx01', text: 'Sexta-feira chegou! Hora de guardar os problemas na gaveta e abrir a porta da alegria.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=600&fit=crop', gradientIndex: 0, createdAt: 1700000045000, isNew: true },
+  { id: 'sx02', text: 'Sextou! Que este final de semana seja regado de boas risadas, boa m\u00fasica e muita paz.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1476673160081-cf065607f449?w=600&h=600&fit=crop', gradientIndex: 1, createdAt: 1700000046000 },
+  { id: 'sx03', text: 'A melhor hora da semana chegou! Bora celebrar a vida nesta sexta-feira maravilhosa.', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=600&fit=crop', gradientIndex: 2, createdAt: 1700000047000 },
+  { id: 'sx04', text: 'Sexta \u00e9 dia de agradecer pela semana e se preparar para um final de semana incr\u00edvel!', categoria: 'Sexta-feira', emoji: '', imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop', gradientIndex: 3, createdAt: 1700000048000 },
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────
@@ -271,15 +271,19 @@ async function generateCompositeImage(
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-  // 2. Draw background image if available
+  // 2. Draw background image if available (via proxy to avoid CORS)
   if (phrase.imageUrl) {
     try {
+      const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(phrase.imageUrl)}`
+      const resp = await fetch(proxyUrl)
+      if (!resp.ok) throw new Error('Proxy fetch failed')
+      const blob = await resp.blob()
+      const bitmapUrl = URL.createObjectURL(blob)
       const img = new Image()
-      img.crossOrigin = 'anonymous'
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve()
         img.onerror = () => reject(new Error('Image load failed'))
-        img.src = phrase.imageUrl
+        img.src = bitmapUrl
       })
       // Cover-fit the image
       const imgRatio = img.width / img.height
@@ -297,6 +301,7 @@ async function generateCompositeImage(
         drawY = (CANVAS_H - drawH) / 2
       }
       ctx.drawImage(img, drawX, drawY, drawW, drawH)
+      URL.revokeObjectURL(bitmapUrl)
     } catch {
       // Gradient fallback already drawn
     }

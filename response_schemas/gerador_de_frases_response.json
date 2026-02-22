@@ -1,0 +1,18 @@
+{
+  "agent_name": "Gerador de Frases",
+  "agent_id": "699a74a9c2eec05acd279d41",
+  "description": "Gera frases bonitas, inspiracionais e emotivas em portugu\u00eas brasileiro para imagens de compartilhamento. Recebe a categoria (bom dia, f\u00e9, amor, etc.) e o tom desejado, produzindo textos curtos, impactantes e culturalmente relevantes para o p\u00fablico brasileiro.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "frase": "string",
+    "categoria": "string",
+    "emoji": "string"
+  },
+  "example_response": {
+    "frase": "A frase inspiracional gerada",
+    "categoria": "A categoria da frase (bom dia, f\u00e9, amor, etc.)",
+    "emoji": "Um emoji relevante para a frase"
+  }
+}

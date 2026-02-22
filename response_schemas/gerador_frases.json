@@ -1,0 +1,17 @@
+{
+  "agent_name": "Gerador de Frases",
+  "agent_id": "699a74a9c2eec05acd279d41",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "response_schema": {
+    "frase": "string - A frase inspiracional gerada",
+    "categoria": "string - A categoria da frase",
+    "emoji": "string - Um emoji relevante para a frase"
+  },
+  "sample_response": {
+    "frase": "Que o sol deste novo dia ilumine seus caminhos e aqueça seu coração com esperança e gratidão.",
+    "categoria": "Bom Dia",
+    "emoji": "☀️"
+  }
+}
